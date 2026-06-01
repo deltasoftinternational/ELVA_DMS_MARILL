@@ -1,0 +1,7 @@
+.vscode/.alcache/*.*
+.vscode/.altemplates/table.dictionary.json
+.vscode/.altemplates/table.entry.json
+ELVA_ELVA DMS_1.0.0.0.app
+.vscode/rad.json
+.alpackages/*.app
+*.app

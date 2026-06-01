@@ -1,0 +1,210 @@
+﻿.ms-nav-actionbar-container { 
+    box-sizing: border-box;
+    color: rgb(68, 68, 68);
+    display: flex;
+    flex-basis: auto;
+    flex-direction: row;
+    flex-grow: 0;
+    flex-shrink: 0;
+    float: none;
+    font-family: "Segoe UI", "Segoe WP", Segoe, device-segoe, Tahoma, Helvetica, Arial, sans-serif;
+    font-size: 13.3333px;
+    font-weight: 400;
+    height: 70px;
+    justify-content: flex-end;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    padding-bottom: 21px;
+    padding-left: 21px;
+    padding-right: 7px;
+    padding-top: 21px;
+    -webkit-box-direction: normal;
+    -webkit-box-flex: 0;
+    -webkit-box-orient: horizontal;
+    -webkit-box-pack: end;
+}
+
+/*
+.ms-nav-button.highlight-btn {
+    background-color: #0072C6;
+    font-weight: bold;
+    color: #FFF;
+}
+
+.ms-nav-button {
+    padding: 7px 10px;
+    min-width: 6em;
+    cursor: pointer;
+    color: #444;
+}
+
+button, input[type="button"], input[type="reset"], input[type="submit"], .inputButton {
+    -webkit-appearance: button;
+    cursor: pointer;
+    border: 1px solid #ababab;
+    font-family: "Segoe UI", "Segoe WP", Segoe, device-segoe, Tahoma, Helvetica, Arial, sans-serif;
+    font-weight: normal;
+    font-size: 11px;
+    margin-left: 10px;
+    background-color: #fdfdfd;
+}
+
+button {
+    -webkit-appearance: button;
+    -webkit-writing-mode: horizontal-tb !important;
+    text-rendering: auto;
+    color: buttontext;
+    letter-spacing: normal;
+    word-spacing: normal;
+    text-transform: none;
+    text-indent: 0px;
+    text-shadow: none;
+    display: inline-block;
+    text-align: center;
+    align-items: flex-start;
+    cursor: default;
+    background-color: buttonface;
+    box-sizing: border-box;
+    margin: 0em;
+    font: 400 13.3333px Arial;
+    padding: 1px 6px;
+    border-width: 2px;
+    border-style: outset;
+    border-color: buttonface;
+    border-image: initial;
+}
+*/
+button {
+    align-items: flex-start;
+    background-color: rgb(253, 253, 253);
+    border-bottom-color: rgb(171, 171, 171);
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-image-outset: 0px;
+    border-image-repeat: stretch;
+    border-image-slice: 100%;
+    border-image-source: none;
+    border-image-width: 1;
+    border-left-color: rgb(171, 171, 171);
+    border-left-style: solid;
+    border-left-width: 1px;
+    border-right-color: rgb(171, 171, 171);
+    border-right-style: solid;
+    border-right-width: 1px;
+    border-top-color: rgb(171, 171, 171);
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-top-style: solid;
+    border-top-width: 1px;
+    box-sizing: border-box;
+    color: rgb(68, 68, 68);
+    cursor: pointer;
+    display: block;
+    font-family: "Segoe UI", "Segoe WP", Segoe, device-segoe, Tahoma, Helvetica, Arial, sans-serif;
+    font-size: 11px;
+    font-stretch: 100%;
+    font-style: normal;
+    font-variant-caps: normal;
+    font-variant-east-asian: normal;
+    font-variant-ligatures: normal;
+    font-variant-numeric: normal;
+    font-weight: 400;
+    height: 28px;
+    letter-spacing: normal;
+    line-height: normal;
+    margin-bottom: 0px;
+    margin-left: 10px;
+    margin-right: 0px;
+    margin-top: 0px;
+    min-width: 66px;
+    padding-bottom: 7px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 7px;
+    text-align: center;
+    text-indent: 0px;
+    text-rendering: auto;
+    text-shadow: none;
+    text-transform: none;
+    vertical-align: middle;
+    width: 66px;
+    word-spacing: 0px;
+    writing-mode: horizontal-tb;
+    -webkit-appearance: none;
+    -webkit-box-direction: normal;
+    -webkit-border-image: none;
+}
+
+    button.highlight-btn {
+        align-items: flex-start;
+        background-color: #0072C6;
+        border-bottom-color: rgb(146, 192, 224);
+        border-bottom-left-radius: 0px;
+        border-bottom-right-radius: 0px;
+        border-bottom-style: solid;
+        border-bottom-width: 1px;
+        border-image-outset: 0px;
+        border-image-repeat: stretch;
+        border-image-slice: 100%;
+        border-image-source: none;
+        border-image-width: 1;
+        border-left-color: rgb(146, 192, 224);
+        border-left-style: solid;
+        border-left-width: 1px;
+        border-right-color: rgb(146, 192, 224);
+        border-right-style: solid;
+        border-right-width: 1px;
+        border-top-color: rgb(146, 192, 224);
+        border-top-left-radius: 0px;
+        border-top-right-radius: 0px;
+        border-top-style: solid;
+        border-top-width: 1px;
+        box-sizing: border-box;
+        color: rgb(255, 255, 255);
+        cursor: pointer;
+        display: block;
+        font-family: "Segoe UI", "Segoe WP", Segoe, device-segoe, Tahoma, Helvetica, Arial, sans-serif;
+        font-size: 11px;
+        font-stretch: 100%;
+        font-style: normal;
+        font-variant-caps: normal;
+        font-variant-east-asian: normal;
+        font-variant-ligatures: normal;
+        font-variant-numeric: normal;
+        font-weight: 700;
+        height: 28px;
+        letter-spacing: normal;
+        line-height: normal;
+        margin-bottom: 0px;
+        margin-left: 10px;
+        margin-right: 0px;
+        margin-top: 0px;
+        min-width: 66px;
+        padding-bottom: 7px;
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 7px;
+        text-align: center;
+        text-indent: 0px;
+        text-rendering: auto;
+        text-shadow: none;
+        text-transform: none;
+        vertical-align: middle;
+        width: 66px;
+        word-spacing: 0px;
+        writing-mode: horizontal-tb;
+        -webkit-appearance: none;
+        -webkit-box-direction: normal;
+        -webkit-border-image: none;
+    }
+
+
+button:hover {
+    border-color: #92c0e0;
+    background-color: #e6f2fa;
+}
+button.highlight-btn:hover {
+    background-color: #005593;
+}

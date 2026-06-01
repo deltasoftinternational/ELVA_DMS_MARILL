@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
+  <file datatype="xml" source-language="en-US" target-language="fr-Fr" original="Base Application">
+    <body>
+         <group id="body">
+            <trans-unit id="Enum 1117131368 - EnumValue 3809237070 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Quote</source>
+          <target state="translated">Devis</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Enum Purchase Document Type - EnumValue Quote - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Enum 3739168174 - EnumValue 3809237070 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Quote</source>
+          <target state="translated">Devis</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Enum Purchase Document Type From - EnumValue Quote - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 1434786627 - Action 1733675610 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Item Card - Action RequestApproval - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 1434786627 - Action 2524661601 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 7.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Item Card - Action Category_Category8 - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 1598289728 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Sales Return Order - Action Request Approval - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 1598289728 - Action 3162358218 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 8.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Sales Return Order - Action Category_Category9 - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 1638686336 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Cash Receipt Journal - Action Request Approval - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 1673401186 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Sales Order - Action Request Approval - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 1673401186 - Action 3162358218 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 8.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Sales Order - Action Category_Category9 - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 1708100201 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Sales Credit Memo - Action Request Approval - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 1708100201 - Action 3162358218 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 8.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Sales Credit Memo - Action Category_Category9 - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 1755308350 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Incoming Documents - Action Request Approval - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 1819353702 - Action 1587086413 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 3.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Purchase Quotes - Action Category_Category4 - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 1819353702 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Purchase Quotes - Action Request Approval - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 1948356160 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Sales Credit Memos - Action Request Approval - Property Caption</note>
+        </trans-unit>
+          <trans-unit id="Page 1948356160 - Action 949389796 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 6.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Sales Credit Memos - Action Category_Category7 - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 2259427799 - Action 2224783030 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 4.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Blanket Sales Order - Action Category_Category5 - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 2259427799 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Blanket Sales Order - Action Request Approval - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 2437096118 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Purchase Invoice - Action Request Approval - Property Caption</note>
+        </trans-unit>
+          <trans-unit id="Page 2437096118 - Action 2524661601 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 7.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Purchase Invoice - Action Category_Category8 - Property Caption</note>
+        </trans-unit>
+          <trans-unit id="Page 2583272393 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page General Journal - Action Request Approval - Property Caption</note>
+        </trans-unit>
+           <trans-unit id="Page 2583272393 - Action 2879026819 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page General Journal - Action Category_Request Approval - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 280137910 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Sales Quote - Action Request Approval - Property Caption</note>
+        </trans-unit>
+          <trans-unit id="Page 280137910 - Action 949389796 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 6.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Sales Quote - Action Category_Category7 - Property Caption</note>
+        </trans-unit>
+          <trans-unit id="Page 2901867346 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Customer List - Action Request Approval - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 2901867346 - Action 311693179 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 5.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Customer List - Action Category_Category6 - Property Caption</note>
+        </trans-unit>
+           <trans-unit id="Page 291926049 - Action 1587086413 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 3.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Purchase Credit Memos - Action Category_Category4 - Property Caption</note>
+        </trans-unit>
+          <trans-unit id="Page 291926049 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Purchase Credit Memos - Action Request Approval - Property Caption</note>
+        </trans-unit>
+           <trans-unit id="Page 2965669802 - Action 2224783030 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 4.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Blanket Purchase Order - Action Category_Category5 - Property Caption</note>
+        </trans-unit>
+          <trans-unit id="Page 2965669802 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Blanket Purchase Order - Action Request Approval - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 3113493751 - Action 2224783030 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 4.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Purchase Return Order List - Action Category_Category5 - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 3113493751 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Purchase Return Order List - Action Request Approval - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 3195034673 - Action 1587086413 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 3.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Purchase Order List - Action Category_Category4 - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 3195034673 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Purchase Order List - Action Request Approval - Property Caption</note>
+        </trans-unit>
+          <trans-unit id="Page 3196174509 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Payment Journal - Action Request Approval - Property Caption</note>
+        </trans-unit>
+             <trans-unit id="Page 3196174509 - Action 2879026819 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Payment Journal - Action Category_Request Approval - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 3254621458 - Action 2524661601 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 7.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page O365 Item Card - Action Category_Category8 - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 3321822267 - Action 2224783030 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 4.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Purchase Quote - Action Category_Category5 - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 3321822267 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Purchase Quote - Action Request Approval - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 3332899200 - Action 1587086413 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 3.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Sales Order List - Action Category_Category4 - Property Caption</note>
+        </trans-unit>
+           <trans-unit id="Page 3332899200 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Sales Order List - Action Request Approval - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 387971303 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Purchase Order - Action Request Approval - Property Caption</note>
+        </trans-unit>
+            <trans-unit id="Page 387971303 - Action 3162358218 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 8.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Purchase Order - Action Category_Category9 - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 3925560610 - Action 1587086413 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 3.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Blanket Sales Orders - Action Category_Category4 - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 3925560610 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Blanket Sales Orders - Action Request Approval - Property Caption</note>
+        </trans-unit>
+           <trans-unit id="Page 4034894651 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Sales Invoice - Action Request Approval - Property Caption</note>
+        </trans-unit>
+           <trans-unit id="Page 4034894651 - Action 3162358218 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 8.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Sales Invoice - Action Category_Category9 - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 4037192291 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Purchase Invoices - Action Request Approval - Property Caption</note>
+        </trans-unit>
+            <trans-unit id="Page 4037192291 - Action 311693179 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 5.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Purchase Invoices - Action Category_Category6 - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 4042331808 - Action 2224783030 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 4.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Purchase Credit Memo - Action Category_Category5 - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 4042331808 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Purchase Credit Memo - Action Request Approval - Property Caption</note>
+        </trans-unit>
+           <trans-unit id="Page 4055858012 - Action 2224783030 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 4.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Vendor Card - Action Category_Category5 - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 4055858012 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Vendor Card - Action Request Approval - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 4178721393 - Action 1733675610 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Item List - Action RequestApproval - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 4178721393 - Action 949389796 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 6.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Item List - Action Category_Category7 - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 4194195770 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Vendor List - Action Request Approval - Property Caption</note>
+        </trans-unit>
+            <trans-unit id="Page 523354100 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Customer Card - Action Request Approval - Property Caption</note>
+        </trans-unit>
+          <trans-unit id="Page 523354100 - Action 311693179 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 5.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Customer Card - Action Category_Category6 - Property Caption</note>
+        </trans-unit>
+           <trans-unit id="Page 561208485 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Sales Invoice List - Action Request Approval - Property Caption</note>
+        </trans-unit>
+           <trans-unit id="Page 561208485 - Action 949389796 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 6.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Sales Invoice List - Action Category_Category7 - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 734185571 - Action 2224783030 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 4.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Sales Quotes - Action Category_Category5 - Property Caption</note>
+        </trans-unit>
+            <trans-unit id="Page 734185571 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Sales Quotes - Action Request Approval - Property Caption</note>
+        </trans-unit>
+         <trans-unit id="Page 942220850 - Action 1587086413 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 3.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Sales Return Order List - Action Category_Category4 - Property Caption</note>
+        </trans-unit>
+          <trans-unit id="Page 942220850 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Sales Return Order List - Action Request Approval - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 956135699 - Action 2364670106 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Incoming Document - Action Request Approval - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 956135699 - Action 3162358218 - Property 2879900210" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2">Generated from the PromotedActionCategories property index 8.</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Incoming Document - Action Category_Category9 - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Report 1547114441 - Control 1810094945 - Property 62802879" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Sales Approval Setup,Purchase Approval Setup,Request Approval Setup,All</source>
+          <target state="translated">Paramétrage approbation vente,Paramétrage approbation achat,Paramétrage demandes approbation,Tous</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Report Approval User Setup Test - Control WhatToTest - Property OptionCaption</note>
+        </trans-unit>
+          <trans-unit id="Report 1547114441 - NamedType 1195352358" maxwidth="0" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Request Approval</source>
+          <target state="translated">Demander approbation</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Report Approval User Setup Test - NamedType Text016</note>
+        </trans-unit>
+      </group>
+    </body>
+  </file>
+</xliff>

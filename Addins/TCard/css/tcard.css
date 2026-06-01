@@ -1,0 +1,14 @@
+﻿body{font-family:"Segoe UI","Segoe WP",Segoe,device-segoe,Tahoma,Helvetica,Arial,sans-serif;font-size:.8em;padding:0;margin:0}
+.box-container{overflow:auto;width:210px;position:absolute}
+.box-container .box-header{height:25px;padding:0 5px;margin-bottom:10px;line-height:1.8em}
+.box-button-delete,.box-button-settings{position:absolute;width:16px;height:16px;top:5px;border:0}
+.ui-draggable-handle{cursor:move}
+.box-button-delete,.box-button-settings,.box-item{cursor:pointer;display:block}
+.box-button-settings{right:24px}
+.box-button-delete{right:4px}
+.box-button-delete img,.box-button-settings img{opacity:.6;filter:alpha(opacity=60)}
+.box-item{height:50px;background:rgba(255,255,255,.2);margin:0 0 5px 10px;padding:0;font-size:.9em;line-height:1em;border-left:4px solid rgba(255,255,255,.7);width:175px;position:relative}
+#sgrip,.item-no,.item-label1,.item-text2,.item-text3{position:absolute}
+.item-image1{display:block;width:16px;height:16px;border:0;position:absolute;top:0;right:0}
+.item-label1{width:160px;top:16px;left:5px;font-weight:700;white-space:nowrap;overflow:hidden;line-height:1.4em}
+#sgrip{width:100px;height:6px;bottom:0;cursor:ns-resize;border:0;left:50%;margin-left:-50px}

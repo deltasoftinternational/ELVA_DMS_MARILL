@@ -1,0 +1,262 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <AutoRefresh>0</AutoRefresh>
+  <DataSources>
+    <DataSource Name="DataSource">
+      <ConnectionProperties>
+        <DataProvider>SQL</DataProvider>
+        <ConnectString />
+      </ConnectionProperties>
+      <rd:SecurityType>None</rd:SecurityType>
+    </DataSource>
+  </DataSources>
+  <ReportSections>
+    <ReportSection>
+      <Body>
+        <Height>2in</Height>
+        <Style />
+      </Body>
+      <Width>6.5in</Width>
+      <Page>
+        <Style />
+      </Page>
+    </ReportSection>
+  </ReportSections>
+  <ReportParameters>
+    <ReportParameter Name="ReportNameCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>ReportNameCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>ReportNameCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="PageCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>PageCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>PageCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="DateCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>DateCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>DateCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="ModelCodeCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>ModelCodeCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>ModelCodeCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="SerialNoCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>SerialNoCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>SerialNoCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="InvPmtDateCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>InvPmtDateCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>InvPmtDateCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="AmtExclVATCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>AmtExclVATCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>AmtExclVATCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="VATCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>VATCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>VATCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="AmtInclVATCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>AmtInclVATCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>AmtInclVATCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="PeriodFromCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>PeriodFromCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>PeriodFromCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="PeriodToCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>PeriodToCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>PeriodToCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="No_ScheduleHeaderCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>No_ScheduleHeaderCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>No_ScheduleHeaderCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="ContractNoCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>ContractNoCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>ContractNoCaption</Prompt>
+    </ReportParameter>
+  </ReportParameters>
+  <Code>Public Function BlankZero(ByVal Value As Decimal)
+    if Value = 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankPos(ByVal Value As Decimal)
+    if Value &gt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankZeroAndPos(ByVal Value As Decimal)
+    if Value &gt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNeg(ByVal Value As Decimal)
+    if Value &lt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNegAndZero(ByVal Value As Decimal)
+    if Value &lt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+</Code>
+  <Language>=User!Language</Language>
+  <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
+  <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <rd:ReportID>0eeb6585-38ae-40f1-885b-8d50088d51b4</rd:ReportID>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="CompanyLogo">
+          <DataField>CompanyLogo</DataField>
+        </Field>
+        <Field Name="No_ScheduleHeader">
+          <DataField>No_ScheduleHeader</DataField>
+        </Field>
+        <Field Name="PrintDate">
+          <DataField>PrintDate</DataField>
+        </Field>
+        <Field Name="CustomerNo_ScheduleHeader">
+          <DataField>CustomerNo_ScheduleHeader</DataField>
+        </Field>
+        <Field Name="CustomerName_ScheduleHeader">
+          <DataField>CustomerName_ScheduleHeader</DataField>
+        </Field>
+        <Field Name="CustAddr">
+          <DataField>CustAddr</DataField>
+        </Field>
+        <Field Name="CustAddr2">
+          <DataField>CustAddr2</DataField>
+        </Field>
+        <Field Name="CustCounty">
+          <DataField>CustCounty</DataField>
+        </Field>
+        <Field Name="CustCity">
+          <DataField>CustCity</DataField>
+        </Field>
+        <Field Name="CustPostCode">
+          <DataField>CustPostCode</DataField>
+        </Field>
+        <Field Name="CustCountryName">
+          <DataField>CustCountryName</DataField>
+        </Field>
+        <Field Name="CurrCode">
+          <DataField>CurrCode</DataField>
+        </Field>
+        <Field Name="ContractNo">
+          <DataField>ContractNo</DataField>
+        </Field>
+        <Field Name="VehicleSerialNo">
+          <DataField>VehicleSerialNo</DataField>
+        </Field>
+        <Field Name="VehModelCode">
+          <DataField>VehModelCode</DataField>
+        </Field>
+        <Field Name="Description">
+          <DataField>Description</DataField>
+        </Field>
+        <Field Name="FooterTxt">
+          <DataField>FooterTxt</DataField>
+        </Field>
+        <Field Name="ShowNewVATAmt">
+          <DataField>ShowNewVATAmt</DataField>
+        </Field>
+        <Field Name="ToDate_ScheduleLine">
+          <DataField>ToDate_ScheduleLine</DataField>
+        </Field>
+        <Field Name="AddServiceAmountInclVAT_ScheduleLine">
+          <DataField>AddServiceAmountInclVAT_ScheduleLine</DataField>
+        </Field>
+        <Field Name="AddServiceAmountInclVAT_ScheduleLineFormat">
+          <DataField>AddServiceAmountInclVAT_ScheduleLineFormat</DataField>
+        </Field>
+        <Field Name="RemainingAmount_ScheduleLine">
+          <DataField>RemainingAmount_ScheduleLine</DataField>
+        </Field>
+        <Field Name="RemainingAmount_ScheduleLineFormat">
+          <DataField>RemainingAmount_ScheduleLineFormat</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
+</Report>
