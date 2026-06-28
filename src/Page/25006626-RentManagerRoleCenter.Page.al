@@ -228,8 +228,14 @@ Page 25006626 "Rent Manager Role Center"
                     Image = Capacity;
                     RunObject = report "Rent Revenue by Assets";
                 }
+                action(RentRevenueByCustomers)
+                {
+                    ApplicationArea = Basic;
+                    Caption = 'Rent Revenue by Customers';
+                    Image = Capacity;
+                    RunObject = report "Rent Revenue by Customers";
+                }
             }
         }
     }
 }
-

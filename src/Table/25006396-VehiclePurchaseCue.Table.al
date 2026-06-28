@@ -12,7 +12,8 @@ Table 25006396 "Vehicle Purchase Cue"
         {
             CalcFormula = count("Purchase Header" where("Document Type" = filter(Order),
                                                          Status = filter(Open),
-                                                         "Document Profile" = const("Spare Parts Trade")));
+                                                         "Document Profile" = const("Vehicles Trade"), //DELTA HT
+                                                         "Responsibility Center" = field("Resp. Center Filter"))); //DELTA HT
             Caption = 'To Send or Confirm';
             Editable = false;
             FieldClass = FlowField;
@@ -22,7 +23,8 @@ Table 25006396 "Vehicle Purchase Cue"
             CalcFormula = count("Purchase Header" where("Document Type" = filter(Order),
                                                          Status = filter(Released),
                                                          "Expected Receipt Date" = field("Date Filter"),
-                                                         "Document Profile" = const("Spare Parts Trade")));
+                                                         "Document Profile" = const("Vehicles Trade"), //DELTA HT
+                                                         "Responsibility Center" = field("Resp. Center Filter"))); //DELTA HT
             Caption = 'Upcoming Orders';
             Editable = false;
             FieldClass = FlowField;
@@ -33,7 +35,8 @@ Table 25006396 "Vehicle Purchase Cue"
                                                          Status = filter(Released),
                                                          Receive = filter(true),
                                                          "Completely Received" = filter(false),
-                                                         "Document Profile" = const("Spare Parts Trade")));
+                                                          "Document Profile" = const("Vehicles Trade"), //DELTA HT
+                                                         "Responsibility Center" = field("Resp. Center Filter"))); //DELTA HT
             Caption = 'Outstanding Purchase Orders';
             Editable = false;
             FieldClass = FlowField;
@@ -41,7 +44,8 @@ Table 25006396 "Vehicle Purchase Cue"
         field(5; "Purchase Return Orders - All"; Integer)
         {
             CalcFormula = count("Purchase Header" where("Document Type" = filter("Return Order"),
-                                                         "Document Profile" = const("Spare Parts Trade")));
+                                                         "Document Profile" = const("Vehicles Trade"), //DELTA HT
+                                                         "Responsibility Center" = field("Resp. Center Filter"))); //DELTA HT
             Caption = 'Purchase Return Orders - All';
             Editable = false;
             FieldClass = FlowField;
@@ -51,7 +55,8 @@ Table 25006396 "Vehicle Purchase Cue"
             CalcFormula = count("Purchase Header" where("Document Type" = filter(Order),
                                                          "Completely Received" = filter(true),
                                                          Invoice = filter(false),
-                                                         "Document Profile" = const("Spare Parts Trade")));
+                                                         "Document Profile" = const("Vehicles Trade"), //DELTA HT
+                                                         "Responsibility Center" = field("Resp. Center Filter"))); //DELTA HT
             Caption = 'Not Invoiced';
             Editable = false;
             FieldClass = FlowField;
@@ -61,7 +66,8 @@ Table 25006396 "Vehicle Purchase Cue"
             CalcFormula = count("Purchase Header" where("Document Type" = filter(Order),
                                                          "Completely Received" = filter(true),
                                                          Invoice = filter(true),
-                                                         "Document Profile" = const("Spare Parts Trade")));
+                                                         "Document Profile" = const("Vehicles Trade"), //DELTA HT
+                                                         "Responsibility Center" = field("Resp. Center Filter"))); //DELTA HT
             Caption = 'Partially Invoiced';
             Editable = false;
             FieldClass = FlowField;
@@ -71,6 +77,14 @@ Table 25006396 "Vehicle Purchase Cue"
             Caption = 'Date Filter';
             Editable = false;
             FieldClass = FlowFilter;
+        }
+        field(100; "Resp. Center Filter"; Code[10])  //ADD HT DELTASOFT  
+        {
+
+            Caption = 'Responsibility Center Filter';
+            Editable = false;
+            FieldClass = FlowFilter;
+
         }
     }
 

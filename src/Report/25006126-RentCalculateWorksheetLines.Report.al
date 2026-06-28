@@ -7,7 +7,7 @@ Report 25006126 "Rent Calculate Worksheet Lines"
     {
         dataitem(RentHeaderFilter; "Rent Header")
         {
-            RequestFilterFields = "Sell-to Customer No.", "Document Date";
+            RequestFilterFields = "Sell-to Customer No.", "Document Date", "Deal Type", "Contract No.", "Responsibility Center";
             RequestFilterHeading = 'Rent Header';
             trigger OnAfterGetRecord()
             var
@@ -43,6 +43,7 @@ Report 25006126 "Rent Calculate Worksheet Lines"
                 RentLine.Reset();
                 RentLine.SetRange("Document Type", "Document Type");
                 RentLine.SetRange("Document No.", "No.");
+                RentLine.SetRange("Component Line", false);
                 //RentLine.SetFilter(Status, '%1|%2', RentLine.Status::Rented, RentLine.Status::Returned);
                 RentLine.SetFilter("Last Date Invoiced", '..%1', CalculateOnDate);
                 if RentLine.FindFirst() then begin
@@ -75,7 +76,10 @@ Report 25006126 "Rent Calculate Worksheet Lines"
                                 if RentLine."Manual Invoicing Start Date" <> 0D then
                                     CalcFromDateLine := RentLine."Manual Invoicing Start Date"
                                 else
-                                    CalcFromDateLine := RentLine."Rent Start Date";
+                                    if RentLine."Rent Start Date" = 0D then
+                                        Error(ErrorNoRentDate, RentLine."Document No.", RentLine."Line No.", RentLine."Rent Asset No.")
+                                    else
+                                        CalcFromDateLine := RentLine."Rent Start Date";
 
                             If RentSetup."Rent Period Calc. Type" = RentSetup."Rent Period Calc. Type"::"Standard Period" then
                                 if CalcFromDateLine < CalcToDateLine then
@@ -84,7 +88,7 @@ Report 25006126 "Rent Calculate Worksheet Lines"
                             If RentSetup."Rent Period Calc. Type" = RentSetup."Rent Period Calc. Type"::"Calendar Period" then
                                 if CalcFromDateLine <= CalcToDateLine then
                                     DatesValidToCharge := true;
-
+                            OnBeforeFillRentWkshtLine(DatesValidToCharge, CalcFromDateLine, CalcToDateLine, RentLine);
                             if DatesValidToCharge and not RentLine."Component Line" then begin
                                 RentItem.get(RentLine."Rent Item No.");
 
@@ -106,11 +110,12 @@ Report 25006126 "Rent Calculate Worksheet Lines"
                                     //DaysInPeriod := CalcDate(RentPeriod.Duration, CalcToDateLine) - CalcToDateLine;   
                                     RentPeriod.Testfield(Duration);
                                     DaysInPeriod := RentLine.CalculatePeriod(CalcDate('<CM>', CalcToDateLine), RentPeriod.Duration, '-');
+
                                     if RentSetup."Rent Period Calc. Type" = RentSetup."Rent Period Calc. Type"::"Standard Period" then
                                         RentWkshtLine.Periods := (CalcToDateLine - CalcFromDateLine) / DaysInPeriod
                                     else
                                         RentWkshtLine.Periods := ((CalcToDateLine - CalcFromDateLine) + 1) / DaysInPeriod;
-
+                                    OnAfterCalculatePeriods(RentWkshtLine, CalcFromDateLine);
                                     RentWkshtLine."Unit of Measure Code" := RentPeriod."Unit of Measure Code";
                                     RentWkshtLine.Quantity := RentWkshtLine.Periods * RentWkshtLine."Rent Asset Quantity";
                                     RentWkshtLine."Line Amount" := RentWkshtLine.Periods * RentWkshtLine."Unit Price" * RentWkshtLine."Rent Asset Quantity";
@@ -161,6 +166,7 @@ Report 25006126 "Rent Calculate Worksheet Lines"
                                     RentWkshtLine."To Invoice" := false;
                                 RentWkshtLine.Insert(true);
                                 RentWkshEntryNo += 1;
+                                OnAfterInsertRentCalculateWorkSheetLines(RentWkshtLine, RentWkshEntryNo);
 
                                 if "Overtime Calculation" = "Overtime Calculation"::"Current Period" then
                                     RentWkshEntryNo := RentLine.CreateExtraChargeLinesWorksheetCurrentPeriod(RentWkshEntryNo, CalcToDateLine, RentWkshtLine);
@@ -192,6 +198,9 @@ Report 25006126 "Rent Calculate Worksheet Lines"
             begin
                 if DocumentNo <> '' then
                     SetRange("No.", DocumentNo);
+                //>>DELTA XX
+                OnApplyingFilterOnPreDataItem(RentHeaderFilter);
+                //DELTA XX
             end;
 
             trigger OnPostDataItem()
@@ -315,6 +324,8 @@ Report 25006126 "Rent Calculate Worksheet Lines"
             Error('Please set calculation date.');
     end;
 
+
+
     var
         BLSSetup: Record "BLS Setup";
         CalcPeriod: Record "Payment Terms";
@@ -361,6 +372,7 @@ Report 25006126 "Rent Calculate Worksheet Lines"
         CalculateOnDate: Date;
         DocumentNo: Code[20];
         Txt001: label 'Deal Type is missinig for Rent Order %1. You must specify Deal Type to continue.';
+        ErrorNoRentDate: Label 'There is no Rent Start Date in Rent Order %1, Rent Line %2, Rent Asset No. %3';
 
     local procedure InitCalculation()
     begin
@@ -440,6 +452,27 @@ Report 25006126 "Rent Calculate Worksheet Lines"
         exit(RentWkshEntryNo);
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCalculatePeriods(Var RentBillWkshLine: Record "Rent Billing Worksheet Line"; CalcFromDateLine: Date)
+    begin
+
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInsertRentCalculateWorkSheetLines(var RentBillingWorksheetLine: Record "Rent Billing Worksheet Line"; Var RentEntryNo: integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnApplyingFilterOnPreDataItem(Var RentHeader: Record "Rent Header")
+    begin
+
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeFillRentWkshtLine(var DatesValidToCharge: Boolean; CalcFromDateLine: Date; CalcToDateLine: Date; RentLine: Record "Rent Line")
+    begin
+    end;
 
 }
 

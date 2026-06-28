@@ -108,6 +108,7 @@ Codeunit 25006607 "Rent-Post"
         RentCrMemo: Page "Sales Credit Memo";
         Text101: label 'Deal Type is missing. You must specify Deal Type to continue';
         RentLine2: Record "Rent Line";
+        IsHandled: Boolean;
     begin
         RentSetup.Get;
         if RentSetup."Deal Type Mandatory" then
@@ -132,6 +133,7 @@ Codeunit 25006607 "Rent-Post"
                 RentSalesLine.GetSalesDocument(SalesDocumentType, SalesDocumentNo);
                 if SalesDocumentNo = '' then
                     SalesLinesForInvoicesExists := true;
+                OnBeforeCreateInvoiceCheckValues(RentSalesLine);
             until RentSalesLine.Next = 0;
             if not SalesLinesForInvoicesExists then
                 Error(NoInvoicesCreatedErr);
@@ -176,6 +178,9 @@ Codeunit 25006607 "Rent-Post"
             SalesHeader."Dimension Set ID" := RentHeader."Dimension Set ID";
             SalesHeader."Contract No." := RentHeader."Contract No.";
             SalesHeader.Validate("Posting Date", InvoiceDate);   //add invoice date
+            //>>DELTA XX
+            OnAfterCreateInvoiceHeader(SalesHeader, InvoiceDate);
+            //<<DELTA XX
             SalesHeader.Modify;
 
             SalesInvoiceNo := SalesHeader."No.";
@@ -188,18 +193,21 @@ Codeunit 25006607 "Rent-Post"
                 //RentSalesLine."Invoice No." := SalesHeader."No.";
                 RentSalesLine."To Invoice" := false;
                 RentSalesLine.Modify;
-                if RentSalesLine."Cancels Line No." <> 0 then
-                    CreateCancelingDescriptionLine(SalesHeader, RentSalesLine, NewLineNo);
-                if RentSalesLine."Attached to Rent Line No." <> 0 then begin
-                    if RentSetup."Sales Inv. Line Decr. Text 2" <> '' then
-                        CreateDescriptionSalesLine(RentSetup."Sales Inv. Line Decr. Text 2", SalesHeader, RentSalesLine, NewLineNo);
-                    if RentSetup."Sales Inv. Line Decr. Text 3" <> '' then
-                        CreateDescriptionSalesLine(RentSetup."Sales Inv. Line Decr. Text 3", SalesHeader, RentSalesLine, NewLineNo);
-                    if RentSetup."Sales Inv. Line Decr. Text 4" <> '' then
-                        CreateDescriptionSalesLine(RentSetup."Sales Inv. Line Decr. Text 4", SalesHeader, RentSalesLine, NewLineNo);
-                    if RentLine2.Get(RentSalesLine."Document Type", RentSalesLine."Document No.", RentSalesLine."Attached to Rent Line No.") then
-                        if RentLine2."Invoice Additional Description" <> '' then
-                            CreateDescriptionSalesLine(RentLine2."Invoice Additional Description", SalesHeader, RentSalesLine, NewLineNo);
+                OnBeforeCreateDescriptionSalesLine(SalesHeader, RentSalesLine, RentHeader, IsHandled, NewLineNo);
+                If not IsHandled Then begin
+                    if RentSalesLine."Cancels Line No." <> 0 then
+                        CreateCancelingDescriptionLine(SalesHeader, RentSalesLine, NewLineNo);
+                    if RentSalesLine."Attached to Rent Line No." <> 0 then begin
+                        if RentSetup."Sales Inv. Line Decr. Text 2" <> '' then
+                            CreateDescriptionSalesLine(RentSetup."Sales Inv. Line Decr. Text 2", SalesHeader, RentSalesLine, NewLineNo);
+                        if RentSetup."Sales Inv. Line Decr. Text 3" <> '' then
+                            CreateDescriptionSalesLine(RentSetup."Sales Inv. Line Decr. Text 3", SalesHeader, RentSalesLine, NewLineNo);
+                        if RentSetup."Sales Inv. Line Decr. Text 4" <> '' then
+                            CreateDescriptionSalesLine(RentSetup."Sales Inv. Line Decr. Text 4", SalesHeader, RentSalesLine, NewLineNo);
+                        if RentLine2.Get(RentSalesLine."Document Type", RentSalesLine."Document No.", RentSalesLine."Attached to Rent Line No.") then
+                            if RentLine2."Invoice Additional Description" <> '' then
+                                CreateDescriptionSalesLine(RentLine2."Invoice Additional Description", SalesHeader, RentSalesLine, NewLineNo);
+                    end;
                 end;
             until RentSalesLine.Next = 0;
 
@@ -248,6 +256,7 @@ Codeunit 25006607 "Rent-Post"
         RentSalesLinesExists: Boolean;
         RentHeader: Record "Rent Header";
         RentLine2: Record "Rent Line";
+        IsHandled: Boolean;
     begin
         RentSetup.Get;
 
@@ -303,6 +312,9 @@ Codeunit 25006607 "Rent-Post"
         SalesHeader."Shortcut Dimension 2 Code" := RentHeader."Shortcut Dimension 2 Code";
         SalesHeader."Dimension Set ID" := RentHeader."Dimension Set ID";
         SalesHeader.Validate("Posting Date", InvoiceDate);
+        //>>DELTA XX
+        OnAfterCreateInvoiceHeaderByRentOrders(SalesHeader, InvoiceDate);
+        //<<DELTA XX
         SalesHeader.Modify;
 
         SalesInvoiceNo := SalesHeader."No.";
@@ -326,20 +338,25 @@ Codeunit 25006607 "Rent-Post"
 
                         RentSalesLine."To Invoice" := false;
                         RentSalesLine.Modify;
-                        if RentSalesLine."Cancels Line No." <> 0 then
-                            CreateCancelingDescriptionLine(SalesHeader, RentSalesLine, NewLineNo);
-                        if RentSalesLine."Attached to Rent Line No." <> 0 then begin
-                            if RentSetup."Sales Inv. Line Decr. Text 2" <> '' then
-                                CreateDescriptionSalesLine(RentSetup."Sales Inv. Line Decr. Text 2", SalesHeader, RentSalesLine, NewLineNo);
-                            if RentSetup."Sales Inv. Line Decr. Text 3" <> '' then
-                                CreateDescriptionSalesLine(RentSetup."Sales Inv. Line Decr. Text 3", SalesHeader, RentSalesLine, NewLineNo);
-                            if RentSetup."Sales Inv. Line Decr. Text 4" <> '' then
-                                CreateDescriptionSalesLine(RentSetup."Sales Inv. Line Decr. Text 4", SalesHeader, RentSalesLine, NewLineNo);
-                            if RentLine2.Get(RentSalesLine."Document Type", RentSalesLine."Document No.", RentSalesLine."Attached to Rent Line No.") then
-                                if RentLine2."Invoice Additional Description" <> '' then
-                                    CreateDescriptionSalesLine(RentLine2."Invoice Additional Description", SalesHeader, RentSalesLine, NewLineNo);
+                        OnBeforeCreateDescriptionSalesLine(SalesHeader, RentSalesLine, RentHeader, IsHandled, NewLineNo);
+                        If Not IsHandled Then begin
+                            if RentSalesLine."Cancels Line No." <> 0 then
+                                CreateCancelingDescriptionLine(SalesHeader, RentSalesLine, NewLineNo);
+                            if RentSalesLine."Attached to Rent Line No." <> 0 then begin
+                                if RentSetup."Sales Inv. Line Decr. Text 2" <> '' then
+                                    CreateDescriptionSalesLine(RentSetup."Sales Inv. Line Decr. Text 2", SalesHeader, RentSalesLine, NewLineNo);
+                                if RentSetup."Sales Inv. Line Decr. Text 3" <> '' then
+                                    CreateDescriptionSalesLine(RentSetup."Sales Inv. Line Decr. Text 3", SalesHeader, RentSalesLine, NewLineNo);
+                                if RentSetup."Sales Inv. Line Decr. Text 4" <> '' then
+                                    CreateDescriptionSalesLine(RentSetup."Sales Inv. Line Decr. Text 4", SalesHeader, RentSalesLine, NewLineNo);
+                                if RentLine2.Get(RentSalesLine."Document Type", RentSalesLine."Document No.", RentSalesLine."Attached to Rent Line No.") then
+                                    if RentLine2."Invoice Additional Description" <> '' then
+                                        CreateDescriptionSalesLine(RentLine2."Invoice Additional Description", SalesHeader, RentSalesLine, NewLineNo);
 
+                            end;
                         end;
+
+
                     until RentSalesLine.Next = 0;
                 end;
             until RentOrdersCombined.Next() = 0;
@@ -387,6 +404,9 @@ Codeunit 25006607 "Rent-Post"
             SalesHeader.Validate("Document Type", SalesHeader."document type"::"Credit Memo");
 
         SalesHeader."No. Series" := GetNoSeriesCode(SalesHeader);
+        //>>DELTA XX
+        OnBeforeCreateRentInvoiceHeader(SalesHeader, RentHeader);
+        //<<DELTA XX
         SalesHeader.Insert(true);
 
         //SalesHeader.Validate("Posting Date", "Posting Date");
@@ -403,6 +423,7 @@ Codeunit 25006607 "Rent-Post"
         SalesHeader.Validate("Payment Terms Code", RentHeader."Payment Terms Code");
         SalesHeader.Validate("VAT Bus. Posting Group", RentHeader."VAT Bus. Posting Group");
         //SalesHeader.Validate("Order Date", "Order Date");
+        OnAfterSetCustomerNoOnRentalInvoice(SalesHeader, RentHeader);
         SalesHeader."Posting No." := codNo;
         SalesHeader."Applies-to Doc. Type" := SalesHeader."Applies-to Doc. Type";
         SalesHeader."Applies-to Doc. No." := SalesHeader."Applies-to Doc. No.";
@@ -426,6 +447,7 @@ Codeunit 25006607 "Rent-Post"
         ItemLedgEntry: Record "Item Ledger Entry";
         RentLineAttachedTo: Record "Rent Line";
         Vehicle: Record Vehicle;
+        IsHandled: Boolean;
     begin
         RentSetup.Get;
         //IF UseRentLineNo THEN
@@ -514,15 +536,17 @@ Codeunit 25006607 "Rent-Post"
         SalesLine."Rent Asset No." := RentLineAttachedTo."Rent Asset No.";
         SalesLine."Rent Start Date" := RentSalesLineFrom."Start Date";
         SalesLine."Rent End Date" := RentSalesLineFrom."End Date";
-
-        if RentSalesLineFrom.Type = RentSalesLineFrom.Type::Resource then
-            if RentSetup."Sales Inv. Line Decr. Text 1" <> '' then
-                SetSalesLineDescription(RentSetup."Sales Inv. Line Decr. Text 1", SalesLine, RentSalesLineFrom);
-
+        OnbeforeSetSalesLineDescription(RentSetup, SalesLine, RentSalesLineFrom, IsHandled);
+        if not IsHandled then begin
+            if RentSalesLineFrom.Type = RentSalesLineFrom.Type::Resource then
+                if RentSetup."Sales Inv. Line Decr. Text 1" <> '' then
+                    SetSalesLineDescription(RentSetup."Sales Inv. Line Decr. Text 1", SalesLine, RentSalesLineFrom);
+        end;
         SalesLine."Shortcut Dimension 1 Code" := RentSalesLineFrom."Shortcut Dimension 1 Code";
         SalesLine."Shortcut Dimension 2 Code" := RentSalesLineFrom."Shortcut Dimension 2 Code";
         SalesLine."Dimension Set ID" := RentSalesLineFrom."Dimension Set ID";
         SalesLine.Insert(true);
+        OnAfterInsertSalesLineFromRent(SalesLine, RentSalesLineFrom);
         if RentSalesLineFrom."Vehicle Serial No." <> '' then begin
             Vehicle.Get(RentSalesLineFrom."Vehicle Serial No.");
             SalesLine."Vehicle Serial No." := RentSalesLineFrom."Vehicle Serial No.";
@@ -925,13 +949,14 @@ Codeunit 25006607 "Rent-Post"
         PrintInvoice := pPrintInvoice;
     end;
 
-    local procedure SetSalesLineDescription(DescriptionTemplate: Text; var SalesLineTo: Record "Sales Line"; RentSalesLineFrom: Record "Rent Sales Line")
+    procedure SetSalesLineDescription(DescriptionTemplate: Text; var SalesLineTo: Record "Sales Line"; RentSalesLineFrom: Record "Rent Sales Line")
     var
         RentLineFrom: Record "Rent Line";
         RentHeader: Record "Rent Header";
         RentAsset: Record "Rent Asset";
         RentPeriod: Record "Rent Period";
         Contract: Record Contract;
+        Vehicle: Record Vehicle;
     begin
         if RentSalesLineFrom."Attached to Rent Line No." = 0 then
             exit;
@@ -940,12 +965,14 @@ Codeunit 25006607 "Rent-Post"
 
         Clear(RentAsset);
         Clear(Contract);
+        Clear(Vehicle);
 
         RentHeader.Get(RentSalesLineFrom."Document Type", RentSalesLineFrom."Document No.");
         RentLineFrom.Get(RentSalesLineFrom."Document Type", RentSalesLineFrom."Document No.", RentSalesLineFrom."Attached to Rent Line No.");
         if RentAsset.Get(RentLineFrom."Rent Asset No.") then;
         RentPeriod.Get(RentLineFrom."Rent Period Type");
         if Contract.Get(RentHeader."Contract No.") then;
+        if Vehicle.Get(RentAsset."Vehicle Serial No.") then;
 
         SalesLineTo.Description := DelStr(StrSubstNo(DescriptionTemplate
                                   , RentAsset."No.", RentAsset.Description, RentAsset."Make Code", RentAsset."Serial No.", RentAsset."Model Code", RentAsset."Model Commercial Name"
@@ -956,11 +983,11 @@ Codeunit 25006607 "Rent-Post"
                                   , Format(RentSalesLineFrom."VF Run 1 From"), Format(RentSalesLineFrom."VF Run 1 To")
                                   , Format(RentSalesLineFrom."VF Run 2 From"), Format(RentSalesLineFrom."VF Run 2 To")
                                   , Format(RentSalesLineFrom."VF Run 3 From"), Format(RentSalesLineFrom."VF Run 3 To")
-                                  , RentSalesLineFrom."Document No.", RentHeader."Contract No.", Contract."External Contract No."
+                                  , RentSalesLineFrom."Document No.", RentHeader."Contract No.", Contract."External Contract No.", Vehicle."Registration No."
                                   ), 101);
     end;
 
-    local procedure CreateDescriptionSalesLine(var DescriptionTemplate: Text; SalesHeader: Record "Sales Header"; RentSalesLineFrom: Record "Rent Sales Line"; var NewLineNo: Integer)
+    procedure CreateDescriptionSalesLine(var DescriptionTemplate: Text; SalesHeader: Record "Sales Header"; RentSalesLineFrom: Record "Rent Sales Line"; var NewLineNo: Integer)
     var
         SalesLine: Record "Sales Line";
     begin
@@ -983,7 +1010,7 @@ Codeunit 25006607 "Rent-Post"
         SalesLine.Insert(true);
     end;
 
-    local procedure CreateCancelingDescriptionLine(SalesHeader: Record "Sales Header"; var RentSalesLineFrom: Record "Rent Sales Line"; NewLineNo: Integer)
+    procedure CreateCancelingDescriptionLine(SalesHeader: Record "Sales Header"; var RentSalesLineFrom: Record "Rent Sales Line"; NewLineNo: Integer)
     var
         SalesLine: Record "Sales Line";
         CanceledRentSalesLine: Record "Rent Sales Line";
@@ -1121,5 +1148,51 @@ Codeunit 25006607 "Rent-Post"
         //if Confirm(NewInvoiceMsg, true, CreatedInvoiceCount) then
         //    Page.Run(Page::"Sales Invoice List", SalesHeader);
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateDescriptionSalesLine(SalesHeader: Record "Sales Header"; Var RentSalesLine: Record "Rent Sales Line"; RentHeader: Record "Rent Header"; var IsHandled: Boolean; var NewLineNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnbeforeSetSalesLineDescription(RentSetup: Record "Rent Mgt. Setup"; var SalesLine: Record "Sales Line"; RentSalesLineFrom: Record "Rent Sales Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterSetCustomerNoOnRentalInvoice(var SalesHeader: Record "Sales Header"; RentHeader: Record "Rent Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateInvoiceCheckValues(RentSalesLine: Record "Rent Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInsertSalesLineFromRent(var SalesLine: Record "Sales Line"; var RentSalesLineFrom: Record "Rent Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCreateInvoiceHeaderByRentOrders(var SalesHeader: Record "Sales Header"; DocumentDate: Date)
+    begin
+
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCreateInvoiceHeader(var SalesHeader: Record "Sales Header"; DocumentDate: Date)
+    begin
+
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateRentInvoiceHeader(var SalesHeader: Record "Sales Header"; var RentHeader: Record "Rent Header")
+    begin
+
+    end;
+
+
+
 }
 

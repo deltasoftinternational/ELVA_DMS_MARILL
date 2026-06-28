@@ -2383,6 +2383,7 @@ Table 25006620 "Rent Sales Line"
             LineNo := CancelingRentSalesLine."Line No." + 10000;
         CancelingRentSalesLine.Init;
         CancelingRentSalesLine := RentSalesLineToCancel;
+        OnAfterInitCancelingRentSalesLine(CancelingRentSalesLine);
         CancelingRentSalesLine."Line No." := LineNo;
         CancelingRentSalesLine.Validate(Quantity, -RentSalesLineToCancel.Quantity);
         CancelingRentSalesLine."Cancels Line No." := RentSalesLineToCancel."Line No.";
@@ -2446,5 +2447,9 @@ Table 25006620 "Rent Sales Line"
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInitCancelingRentSalesLine(var RentsaleslineToCancel: record "Rent Sales Line")
+    begin
+    end;
 }
 

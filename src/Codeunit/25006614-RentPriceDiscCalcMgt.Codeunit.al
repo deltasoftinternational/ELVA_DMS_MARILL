@@ -9,7 +9,7 @@ Codeunit 25006614 "Rent Price & Disc. Calc. Mgt."
         GLSetup: Record "General Ledger Setup";
         Currency: Record Currency;
         TempSalesPrice: Record "Rent Item Sales Price" temporary;
-        VATCalcType: Option "Normal VAT","Reverse Charge VAT","Full VAT","Sales Tax";
+        VATCalcType: Enum "Tax Calculation Type";
         RentSetup: Record "Rent Mgt. Setup";
         VATPerCent: Decimal;
         PricesInclVAT: Boolean;
@@ -363,17 +363,27 @@ then
     var
         Customer: Record Customer;
         CustomerPriceGroup: Record "Customer Price Group";
+        CustomerPriceGroupCode: Code[20];
         RentPeriod: Record "Rent Period";
     begin
         SetCurrency(RentHeader."Currency Code", RentHeader."Currency Factor", RentHeaderExchDate(RentHeader));
         SetVAT(RentHeader."Prices Including VAT", RentLine."VAT %", RentLine."VAT Calculation Type", RentLine."VAT Bus. Posting Group");
         if PricesInCurrency then
             RentHeader.TestField("Currency Factor");
+        //>>DELTA XX
+
+        CustomerPriceGroupCode := RentHeader."Customer Price Group";
+        OnBeforeFindRentSalesLinePrice(RentHeader, RentLine, CustomerPriceGroupCode);
+        // FindSalesPrice(
+        //           TempSalesPrice, RentHeader."Bill-to Customer No.", RentHeader."Bill-to Contact No.",
+        //           RentHeader."Customer Price Group", '', RentLine."Rent Item No.", RentLine."Rent Period Type", RentHeader."Currency Code",
+        //           RentHeader."Document Date", false);
 
         FindSalesPrice(
           TempSalesPrice, RentHeader."Bill-to Customer No.", RentHeader."Bill-to Contact No.",
-          RentHeader."Customer Price Group", '', RentLine."Rent Item No.", RentLine."Rent Period Type", RentHeader."Currency Code",
+          CustomerPriceGroupCode, '', RentLine."Rent Item No.", RentLine."Rent Period Type", RentHeader."Currency Code",
           RentHeader."Document Date", false);
+        //<<DELTA XX
 
         CalcBestUnitPrice(TempSalesPrice);
 
@@ -388,22 +398,27 @@ then
     var
         TempRentItemDisc: Record "Rent Item Sales Discount" temporary;
     begin
-        FillTempRentItemDisc(TempRentItemDisc, true, RentHeader."Currency Code", RentHeader."Document Date", RentHeader."Document Date", RentLine."Rent Item No.", RentHeader."Sell-to Customer No."
-                              , '', RentLine."Rent Period Type");
+        FillTempRentItemDisc(TempRentItemDisc, true, RentHeader."Currency Code", RentHeader."Document Date", RentHeader."Document Date", RentLine."Rent Item No.", RentHeader."Bill-to Customer No."
+                              , '', RentLine."Rent Period Type", RentLine);
         TempRentItemDisc.Reset;
         TempRentItemDisc.SetCurrentkey("Line Discount %");
         TempRentItemDisc.SetAscending("Line Discount %", false);
-        if TempRentItemDisc.FindLast then
+        //>>DELTA
+        //if TempRentItemDisc.FindLast then
+        //Should be
+        if TempRentItemDisc.Findfirst then
             exit(TempRentItemDisc."Line Discount %")
         else
             exit(0);
     end;
 
-    procedure FillTempRentItemDisc(var TempRentItemDisc: Record "Rent Item Sales Discount" temporary; UseDateFilter: Boolean; CurrencyCode: Code[10]; StartingDate: Date; EndingDate: Date; RentItemNo: Code[20]; CustomerNo: Code[20]; CampaignNo: Code[20]; RentPeriodCode: Code[10])
+    procedure FillTempRentItemDisc(var TempRentItemDisc: Record "Rent Item Sales Discount" temporary; UseDateFilter: Boolean; CurrencyCode: Code[10]; StartingDate: Date; EndingDate: Date; RentItemNo: Code[20]; CustomerNo: Code[20]; CampaignNo: Code[20]; RentPeriodCode: Code[20]; var RentLine: Record "Rent Line")
     var
         RentItemSalesDisc: Record "Rent Item Sales Discount";
+        RentItemSalesDisc2: Record "Rent Item Sales Discount";
         RentItem: Record "Rent Item";
         Customer: Record Customer;
+        CustomerDiscGroupCode: Code[20];
     begin
         RentItemSalesDisc.Reset;
         RentItemSalesDisc.SetFilter("Currency Code", '%1|%2', CurrencyCode, '');
@@ -431,23 +446,32 @@ then
                         end;
                     end;
             end;
-            for RentItemSalesDisc."Sales Type" := RentItemSalesDisc."sales type"::"All Customers" to RentItemSalesDisc."sales type"::"Customer Discount Group" do begin
-                case RentItemSalesDisc."Sales Type" of
-                    RentItemSalesDisc."sales type"::Customer:
+            //RAMZI
+            for RentItemSalesDisc2."Sales Type" := RentItemSalesDisc2."sales type"::Customer to RentItemSalesDisc2."sales type"::Campaign do begin
+                //>>DELTA XX
+                RentItemSalesDisc.SetRange("Sales Type", RentItemSalesDisc2."Sales Type");
+                //<<DELTA XX
+                case RentItemSalesDisc2."Sales Type" of
+                    RentItemSalesDisc2."sales type"::Customer:
                         RentItemSalesDisc.SetRange("Sales Code", CustomerNo);
-                    RentItemSalesDisc."sales type"::"All Customers":
+                    RentItemSalesDisc2."sales type"::"All Customers":
                         RentItemSalesDisc.SetRange("Sales Code");
-                    RentItemSalesDisc."sales type"::"Customer Discount Group":
+
+                    RentItemSalesDisc2."sales type"::"Customer Discount Group":
                         begin
                             Customer.Get(CustomerNo);
-                            RentItemSalesDisc.SetRange("Sales Code", Customer."Customer Disc. Group");
+                            CustomerDiscGroupCode := Customer."Customer Disc. Group";
+                            //>>DELTA XX
+                            OnBeforeFindRentSalesLineCustomerDiscountGroup(RentLine, CustomerDiscGroupCode);
+                            //<<DELTA XX
+                            RentItemSalesDisc.SetRange("Sales Code", CustomerDiscGroupCode);
                         end;
                 end;
                 if RentItemSalesDisc.FindSet then
                     repeat
                         TempRentItemDisc.Init;
                         TempRentItemDisc.TransferFields(RentItemSalesDisc);
-                        TempRentItemDisc.Insert;
+                        IF TempRentItemDisc.Insert THEN;
                     until RentItemSalesDisc.Next = 0;
             end;
         end;
@@ -472,5 +496,20 @@ then
     local procedure OnAfterFindRentSalesPriceWeekly(var RentLine: Record "Rent Line"; var RentSalesPrice: Record "Rent Item Sales Price")
     begin
     end;
+
+
+    //>>DELTA XX
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeFindRentSalesLinePrice(RentHeader: Record "Rent Header"; var RentLine: Record "Rent Line"; Var CustomerPriceGroupCode: Code[20])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure
+    OnBeforeFindRentSalesLineCustomerDiscountGroup(var RentLine: Record "Rent Line"; Var CustomerDiscGroupCode: Code[20]);
+    begin
+
+    end;
+    //<<DELTA XX
 }
 

@@ -616,7 +616,9 @@ Codeunit 25006619 "Rent Schedule Add-In Mgt."
                     else
                         ResourceItemName := RentAsset."No.";
                 end;
-
+                //>>DELTA XX
+                OnAfterCreatePlanningResourceDescription(RentAsset, ResourceItemName);
+                //<<DELTA XX
                 AddItemEntry(ScheduleItem,
                   ItemID, //Item ID
                   RentResourceToIncludeTmp."Rent Asset No.", //Item No.
@@ -1263,6 +1265,11 @@ Codeunit 25006619 "Rent Schedule Add-In Mgt."
                 end;
             until ScheduleCellConfig.Next = 0;
         exit(EndText);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCreatePlanningResourceDescription(RentAsset: Record "Rent Asset"; var ResourceItemName: Text)
+    begin
     end;
 }
 

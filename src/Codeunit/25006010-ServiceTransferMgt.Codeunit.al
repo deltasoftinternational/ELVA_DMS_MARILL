@@ -92,6 +92,7 @@ Codeunit 25006010 "Service Transfer Mgt."
         ReservationMgtEDMS: Codeunit "Reservation Management EDMS";
         QtyTransfered: Decimal;
         Item: Record Item;
+        IsHandled: Boolean;
     begin
         // LineNo := 10000;                                                              // 19.03.2014 Elva Baltic P21
         LineNo := 0;                                                                     // 19.03.2014 Elva Baltic P21
@@ -106,7 +107,7 @@ Codeunit 25006010 "Service Transfer Mgt."
             GlobalServLine.SetRange("Document No.", TransferHeader."Source No.");
             GlobalServLine.SetRange(Type, GlobalServLine.Type::Item);
             //<< BHA 26/12/20222
-            OnBeforeCreateTransferFromLine(GlobalServLine);
+            OnBeforeCreateTransferFromLine(GlobalServLine, TransferHeader);
             //>> BHA 26/12/2022
             if GlobalServLine.FindFirst then
                 repeat
@@ -124,6 +125,7 @@ Codeunit 25006010 "Service Transfer Mgt."
                                                 GlobalServLine."Variant Code",
                                                 GlobalServLine."Qty. to Return");
                                 //<< BHA 13/03/2023
+                                TransferLine.Validate("Unit of Measure Code", ServiceLine."Unit of Measure Code"); // ADD BY DELT BUG MEASURE CODE
                                 OnAfterCreateTransferFromLine(TransferLine, GlobalServLine);
                                 //>> BHA 13/03/2023
                                 //Changing reservations in 4 steps
@@ -162,23 +164,30 @@ Codeunit 25006010 "Service Transfer Mgt."
                         if Item.type = Item.type::Inventory then begin
                             ServiceLine.CalcFields("Reserved Quantity");
                             if ServiceLine."Reserved Quantity" < ServiceLine.Quantity then begin
-                                LineNo += 10000;
-                                CreateTransferLine(TransferHeader,
-                                                TransferLine,
-                                                LineNo,
-                                                ServiceLine."No.",
-                                                //>>DELTA 03
-                                                ServiceLine."Variant Code",
-                                                ServiceLine.Quantity - ServiceLine."Reserved Quantity");
-                                //<< BHA 13/03/2023
-                                TransferLine.Validate("Unit of Measure Code", ServiceLine."Unit of Measure Code");
-                                OnAfterCreateTransferToLine(TransferLine, ServiceLine);
-                                //>> BHA 13/03/2023
-                                CheckLineReservation(TransferLine, ServiceLine);
-                                TransferLine.AutoReserveServ(1);
-                                // IF ServiceSetup."Inbound Transf. Auto-Reserve" THEN                            // 19.03.2014 Elva Baltic P21
-                                if ServiceSetup."Inbound Transf. Auto-Reserve" and AutoReserveOutbndQty then      // 19.03.2014 Elva Baltic P21
-                                    TransferLine.AutoReserveSilent(0); //Automatically reserves outbound qty. to ILE, PO, etc on Spare Parts Location
+                                IsHandled := false;
+                                OnAfterCheckReservedQuantity(ServiceLine, IsHandled);
+                                if not ishandled then begin
+                                    IsHandled := false;
+                                    OnBeforeCreateTransferLine(TransferHeader, TransferLine, LineNo, ServiceLine, IsHandled);
+                                    if not IsHandled then begin
+                                        LineNo += 10000;
+                                        CreateTransferLine(TransferHeader,
+                                                        TransferLine,
+                                                        LineNo,
+                                                        ServiceLine."No.",
+                                                        //>>DELTA 03
+                                                        ServiceLine."Variant Code",
+                                                        ServiceLine.Quantity - ServiceLine."Reserved Quantity");
+                                    end;
+                                    //<< BHA 13/03/2023
+                                    OnAfterCreateTransferToLine(TransferLine, ServiceLine);
+                                    //>> BHA 13/03/2023
+                                    CheckLineReservation(TransferLine, ServiceLine);
+                                    TransferLine.AutoReserveServ(1);
+                                    // IF ServiceSetup."Inbound Transf. Auto-Reserve" THEN                            // 19.03.2014 Elva Baltic P21
+                                    if ServiceSetup."Inbound Transf. Auto-Reserve" and AutoReserveOutbndQty then      // 19.03.2014 Elva Baltic P21
+                                        TransferLine.AutoReserveSilent(0); //Automatically reserves outbound qty. to ILE, PO, etc on Spare Parts Location
+                                end;
                             end;
                         end;
                     until ServiceLine.Next = 0;
@@ -275,6 +284,7 @@ Codeunit 25006010 "Service Transfer Mgt."
         ServiceLineTmp: Record "Service Line EDMS" temporary;
         TransferCreated: Boolean;
         IsHandled: boolean;
+        IsHandledLine: Boolean;
         Err001: Label 'Il n'' y a rien à transférer';
     begin
         OnBeforeFillOptionNumber(OptionNumber, ServiceHeader, IsHandled);
@@ -298,14 +308,19 @@ Codeunit 25006010 "Service Transfer Mgt."
                 until ServiceLineTmp.Next = 0;
         end else begin
             GetDocumentSparePartLocations(ServiceHeader, ServiceLineTmp);
+            OnafterGetDocumentSparePartLocations(ServiceHeader, ServiceLineTmp);
             SparePartLocation := GetDefaultSparePartLocation;
             ServiceLineTmp.Reset;
             if ServiceLineTmp.FindFirst then
                 repeat
                     Clear(TransferHeader);
-                    FillLines := CreateTransOrderHByServH(ServiceHeader, TransferHeader, (OptionNumber = 1), SparePartLocation, ServiceLineTmp."Location Code", ServiceLineTmp."Location Code", TransferCreated);
-                    if FillLines then
-                        FillTransfLinesFromService(TransferHeader, true, SparePartLocation);
+                    //FillLines := CreateTransOrderHByServH(ServiceHeader, TransferHeader, (OptionNumber = 1), SparePartLocation, ServiceLineTmp."Location Code", ServiceLineTmp."Location Code", TransferCreated);
+                    OnBeforeFillTransfLinesFromService(ServiceHeader, TransferHeader, ServiceLineTmp, TransferCreated, OptionNumber, IsHandledLine);
+                    if not IsHandledLine then begin
+                        FillLines := CreateTransOrderHByServH(ServiceHeader, TransferHeader, (OptionNumber = 1), SparePartLocation, ServiceLineTmp."Location Code", ServiceLineTmp."Transfer From Location Code", TransferCreated);       //26.04.2024 EB.KN
+                        if FillLines then
+                            FillTransfLinesFromService(TransferHeader, true, SparePartLocation);
+                    end;
                 until ServiceLineTmp.Next = 0;
         end;
 
@@ -314,9 +329,9 @@ Codeunit 25006010 "Service Transfer Mgt."
         //>>DELTA 01
         IF ServiceLineTmp.Count = 0 then
             ERROR(Err001);
+        //<<DELTA 01
         IsHandled := false;
         OnBeforeOpenTransferOrder(ServiceHeader, IsHandled);
-        //<<DELTA 01
         if not IsHandled then
             Page.RunModal(Page::"Transfer Order", TransferHeader);
 
@@ -354,7 +369,6 @@ Codeunit 25006010 "Service Transfer Mgt."
         TransferLine."Document Profile" := TransferLine."document profile"::Service;
         TransferLine.Validate("Item No.", ItemNo);
         TransferLine."Variant Code" := VariantCode;
-
         if IsServiceLocation(TransferHeader."Transfer-to Code") then
             CalcAvailability(TransferLine, Quantity);
         TransferLine.Validate(Quantity, Quantity);
@@ -440,13 +454,20 @@ Codeunit 25006010 "Service Transfer Mgt."
 
         //>>DELTA 03
         PostedServiceLine.SetRange("Document No.", SalesHeader."Service Document No.");
+        //DELTA 20.11.25
+        PostedServiceLine.SetRange(Type, PostedServiceLine.Type::Item);
+        //
         IF PostedServiceLine.FindSet() then
             repeat
-                if PostedServiceLine."Transfer From Location Code" <> '' then begin
-                    LocationBuffer.Init();
-                    LocationBuffer.code := PostedServiceLine."Transfer From Location Code";
-                    if LocationBuffer.Insert() then;
-                end;
+                if PostedServiceLine."Transfer From Location Code" <> '' then
+                    //DELTA 20.11.25
+                    if item.Get(PostedServiceLine."No.") then
+                        if item.Type = item.Type::Inventory then Begin
+                            //
+                            LocationBuffer.Init();
+                            LocationBuffer.code := PostedServiceLine."Transfer From Location Code";
+                            if LocationBuffer.Insert() then;
+                        end;
             until PostedServiceLine.Next() = 0;
         if LocationBuffer.Count = 0 then begin
             LocationBuffer.Init();
@@ -587,7 +608,7 @@ Codeunit 25006010 "Service Transfer Mgt."
         GrossRequirement: Decimal;
         ScheduledReceipt: Decimal;
         AvailableQty: Decimal;
-        PeriodType: Option Day,Week,Month,Quarter,Year;
+        PeriodType: Enum "Analysis Period Type";
         AvailabilityDate: Date;
         LookaheadDateformula: DateFormula;
         EmptyDateFormula: DateFormula;
@@ -664,8 +685,8 @@ Codeunit 25006010 "Service Transfer Mgt."
         end
         else begin
             FromLocation := ServiceHeader."Location Code";
-            ToLocation := SparePartLocation; // 20.09.2023 EB.RC
-            //ToLocation := ToLocationCodeLine;
+            //ToLocation := SparePartLocation; // 20.09.2023 EB.RC
+            ToLocation := ToLocationCodeLine;
 
             case ServiceSetup."Outbound Transfer Line Filling" of
                 ServiceSetup."outbound transfer line filling"::Manual:
@@ -697,6 +718,7 @@ Codeunit 25006010 "Service Transfer Mgt."
             // 07.03.2014 Elva Baltic P21 <<
             TransferHeader.Reset;
             TransferHeader.Init;
+            TransferHeader."Document Profile" := TransferHeader."document profile"::Service;//Delta 26.01.2026
             TransferHeader.Insert(true);
             TransferHeader.Validate("Transfer-from Code", FromLocation);
             TransferHeader.Validate("Transfer-to Code", ToLocation);
@@ -704,7 +726,7 @@ Codeunit 25006010 "Service Transfer Mgt."
             if (TransferHeader."In-Transit Code" = '') and (ServiceSetup."Def. In-Transit Location Code" <> '') then
                 TransferHeader.Validate("In-Transit Code", ServiceSetup."Def. In-Transit Location Code");
             // 30.03.2023 Elva DMS KN <<
-            TransferHeader."Document Profile" := TransferHeader."document profile"::Service;
+            // TransferHeader."Document Profile" := TransferHeader."document profile"::Service;//Delta 26.01.2026 Moved up before insert
             TransferHeader."Source Type" := Database::"Service Header EDMS";
             TransferHeader."Source Subtype" := ServiceHeader."Document Type";
             TransferHeader."Source No." := ServiceHeader."No.";
@@ -1109,11 +1131,13 @@ Codeunit 25006010 "Service Transfer Mgt."
     var
         ServiceLine: Record "Service Line EDMS";
         LineNo: Integer;
+        IsHandled: Boolean;
     begin
         ServiceLine.SetRange("Document No.", ServiceHeader."No.");
         ServiceLine.SetRange("Document Type", ServiceHeader."Document Type");
         ServiceLine.SetRange(Type, ServiceLine.Type::Item);
         //ServiceLine.SETFILTER("Transfer From Location Code",'<>%1',''); //28.03.2018 EB.RC POD
+        OnBeforeFindServiceLine(ServiceLine);
 
         ServiceLineTmp.DeleteAll;
 
@@ -1126,9 +1150,14 @@ Codeunit 25006010 "Service Transfer Mgt."
                     ServiceLineTmp.SetRange("Location Code", ServiceLine."Location Code"); //28.03.2018 EB.RC POD
                     if not ServiceLineTmp.FindFirst then begin
                         if ServiceLine.Quantity > ServiceLine."Reserved Quantity" then begin
-                            ServiceLineTmp.Init;
-                            ServiceLineTmp := ServiceLine;
-                            ServiceLineTmp.Insert;
+                            IsHandled := false;
+                            OnBeforeInsertServiceLineTmp(ServiceLineTmp, ServiceLine, IsHandled);
+                            IF not IsHandled then begin
+                                ServiceLineTmp.Init;
+                                ServiceLineTmp := ServiceLine;
+                                ServiceLineTmp.Insert;
+                            end;
+
                         end;
                     end;
                 end;
@@ -1144,7 +1173,7 @@ Codeunit 25006010 "Service Transfer Mgt."
         ServiceLine.SetRange(Type, ServiceLine.Type::Item);
         ServiceLine.SetFilter("Location Code", '<>%1', '');
         ServiceLine.SetFilter("Qty. to Return", '>0');         // 31.08.2017 EB.AMU POD.DMS.Service
-
+        onBeforeFilterGetDocumentSparePartLocations(ServiceLine);
         ServiceLineTmp.DeleteAll;
 
         if ServiceLine.FindFirst then
@@ -1212,8 +1241,8 @@ Codeunit 25006010 "Service Transfer Mgt."
             TransferLine.SetRange("Document No.", TransferHeader."No.");
             CreateTransferLine(TransferHeader, TransferLine, 10000, ServiceLine."No.", ServiceLine."Variant Code",
             QuantityToReq);
-            CreateReqLinesFromTransfer(TransferHeader, false, 0);
             TransferLine.AutoReserveSilent(1);
+            CreateReqLinesFromTransfer(TransferHeader, false, 0);
             ReleaseTransferDocument.Run(TransferHeader);
         end;
 
@@ -1316,7 +1345,7 @@ Codeunit 25006010 "Service Transfer Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateTransferFromLine(Var ServiceLine: Record "Service Line EDMS")
+    local procedure OnBeforeCreateTransferFromLine(Var ServiceLine: Record "Service Line EDMS"; TransferHeader: Record "Transfer Header")
     begin
     end;
 
@@ -1340,8 +1369,25 @@ Codeunit 25006010 "Service Transfer Mgt."
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeInsertServiceLineTmp(var ServiceLineTmp: Record "Service Line EDMS"; ServiceLine: Record "Service Line EDMS"; var IsHandled: Boolean)
+    begin
+    end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateTransferLine(TransferHeader: Record "Transfer Header"; Var TransferLine: Record "Transfer Line"; Var LineNo: Integer; ServiceLine: Record "Service Line EDMS"; var IsHandled: Boolean)
+    begin
+    end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCheckReservedQuantity(ServiceLine: Record "Service Line EDMS"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeFindServiceLine(var ServiceLine: Record "Service Line EDMS")
+    begin
+    end;
     //------------------------------- codeunit 378 "Transfer Extended Text"
     var
         MakeUpdateRequired: Boolean;
@@ -1526,6 +1572,7 @@ Codeunit 25006010 "Service Transfer Mgt."
         GetPlanningParameters: Codeunit "Planning-Get Parameters";
         Text001: label '%1 Requisition Line was created! %2 %3, %4 %5.';
         Text002: label 'Do you want to create order promising?';
+        TransferDirection: Enum "Transfer Direction";
     begin
         if ShowMessage then
             if not Confirm(Text002) then
@@ -1581,7 +1628,7 @@ Codeunit 25006010 "Service Transfer Mgt."
                       ReqLine.Description,
                       ReqLine."Due Date",
                       ReqQty,
-                      ReqLine."Quantity (Base)", ReservEntry, 0);
+                      ReqLine."Quantity (Base)", ReservEntry, TransferDirection::Outbound);
 
                     LineCount += 1;
                     // 14.02.2019 EB.P30 >>
@@ -1629,7 +1676,7 @@ Codeunit 25006010 "Service Transfer Mgt."
         ReqLine."Action Message" := ReqLine."Action Message"::New;
         ReqLine."Accept Action Message" := false;
         ReqLine.Validate("Ending Date",
-          LeadTimeMgt.GetPlannedEndingDate(ItemNo, LocationCode, VariantCode, DueDate, ReqLine."Vendor No.", ReqLine."Ref. Order Type"));
+         LeadTimeMgt.GetPlannedEndingDate(ItemNo, LocationCode, VariantCode, DueDate, ReqLine."Vendor No.", ReqLine."Ref. Order Type"));
         ReqLine."Ending Time" := 235959T;
         ReqLine.Validate(Quantity, Quantity);
         ReqLine.Validate("Unit of Measure Code", Unit);
@@ -1689,6 +1736,24 @@ Codeunit 25006010 "Service Transfer Mgt."
         else
             if Location.Code <> LocationCode then
                 Location.Get(LocationCode);
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnBeforeFillTransfLinesFromService(var ServiceHeader: Record "Service Header EDMS"; var TransferHeader: record "Transfer Header"; ServiceLineTmp: record "Service line EDMS" Temporary; TransferCreated: Boolean; OptionNumber: integer; var IsHandledLine: Boolean)
+    begin
+
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnafterGetDocumentSparePartLocations(var ServiceHeader: Record "Service Header EDMS"; var ServiceLineTmp: record "Service line EDMS" Temporary)
+    begin
+
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure onBeforeFilterGetDocumentSparePartLocations(var ServiceLine: record "Service line EDMS")
+    begin
+
     end;
 
 }

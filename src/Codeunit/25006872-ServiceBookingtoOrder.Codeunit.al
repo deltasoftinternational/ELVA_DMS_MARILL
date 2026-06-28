@@ -6,9 +6,12 @@ Codeunit 25006872 "Service Booking to Order"
     var
         OldServCommentLine: Record "Service Comment Line EDMS";
         Cust: Record Customer;
+        IsHandled: boolean;
     begin
         Rec.TestField("Document Type", Rec."document type"::Booking);
-        Rec.TestField("Booking Resource No.");
+        OnBeforeTestfieldResourceNo(Rec, IsHandled);
+        if not IsHandled then
+            Rec.TestField("Booking Resource No.");
 
         Cust.Get(Rec."Sell-to Customer No.");
         Cust.CheckBlockedCustOnDocs(Cust, Rec."document type"::Order, true, false);
@@ -131,6 +134,11 @@ Codeunit 25006872 "Service Booking to Order"
     procedure SetHideValidationDialog(NewHideValidationDialog: Boolean)
     begin
         HideValidationDialog := NewHideValidationDialog;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeTestfieldResourceNo(Rec: Record "Service Header EDMS"; var IsHandled: Boolean)
+    begin
     end;
 }
 

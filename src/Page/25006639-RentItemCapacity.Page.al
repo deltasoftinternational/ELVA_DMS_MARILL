@@ -467,9 +467,12 @@ Page 25006639 "Rent Item Capacity"
         ShowFieldStartTime: Boolean;
         ShowFieldEndTime: Boolean;
         RentItems: Record "Rent Item";
-        RentAssets: Record "Rent Asset";
         FillByItemOrAsset: Option Item,Asset;
 
+    //>>DELTA XX
+    protected var
+        //<<DELTA XX
+        RentAssets: Record "Rent Asset";
 
     procedure ValidatePeriodStart()
     var

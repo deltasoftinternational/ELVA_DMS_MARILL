@@ -46,7 +46,9 @@ Codeunit 25006610 "RentTransfer-Post"
         if not TransLine.Find('-') then
             Error(Text001);
 
-
+        //>>DELTA RC 31/10/2024
+        OnBeforeCheckTransfertLine(TransHeader, TransLine);
+        //<<DELTA RC 31/10/2024
         Window.Open(
           '#1#################################\\' +
           Text003);
@@ -91,6 +93,7 @@ Codeunit 25006610 "RentTransfer-Post"
 
         if (TransHeader."Posting No." = '') then begin
             TransHeader.TestField("Posting No. Series");
+            OnBeforeGetNextNo(TransHeader);
             TransHeader."Posting No." := NoSeriesMgt.GetNextNo(TransHeader."Posting No. Series", TransHeader."Posting Date", true);
         end;
 
@@ -253,6 +256,7 @@ Codeunit 25006610 "RentTransfer-Post"
         HeaderDeleted := TransHeader.DeleteOneTransferOrder(TransHeader, TransLine);
         Commit;
         Window.Close;
+        OnAfterPostRentTransferDocs(PstTransHeader);
         Rec := TransHeader;
 
     end;
@@ -626,6 +630,7 @@ Codeunit 25006610 "RentTransfer-Post"
         TransHeader.LockTable;
         TransHeader.Init;
         TransHeader."No." := '';
+        OnBeforeGetNextNo(TransHeader);
         TransHeader."No." := NoSeriesMgt.GetNextNo(RentSetup."Rent Shipment Nos.", TransHeader."Posting Date", true);
         if NoSeriesMgt.IsAutomatic(RentSetup."Posted Rent Shpt. Nos.") then
             TransHeader."Posting No. Series" := RentSetup."Posted Rent Shpt. Nos.";
@@ -983,5 +988,19 @@ Codeunit 25006610 "RentTransfer-Post"
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckTransfertLine(var RentTransferHeader: Record "Rent Transfer Header"; var RentTransferLine: Record "Rent Transfer Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetNextNo(var RentTransferHeader: Record "Rent Transfer Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterPostRentTransferDocs(PstTransHeader: Record "Posted Rent Transfer Header")
+    begin
+    end;
 }
 

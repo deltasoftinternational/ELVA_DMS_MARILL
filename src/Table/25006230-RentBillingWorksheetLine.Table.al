@@ -25,10 +25,9 @@ Table 25006230 "Rent Billing Worksheet Line"
                 end;
             end;
         }
-        field(10; "Document Type"; Option)
+        field(10; "Document Type"; enum "Rent Document Type")
         {
             Caption = 'Document Type';
-            OptionMembers = Quote,"Order";
         }
         field(20; "Document No."; Code[20])
         {
@@ -50,11 +49,11 @@ Table 25006230 "Rent Billing Worksheet Line"
             OptionCaption = ' ,Allocated,Rented,Returned';
             OptionMembers = " ","Allocated","Rented","Returned";
         }
-        field(80; Description; Text[50])
+        field(80; Description; Text[100])
         {
             Caption = 'Description';
         }
-        field(81; "Rent Line Description"; Text[50])
+        field(81; "Rent Line Description"; Text[100])
         {
             Caption = 'Rent Line Description';
         }
@@ -203,7 +202,7 @@ Table 25006230 "Rent Billing Worksheet Line"
             Editable = false;
         }
         
-        field(250; "VAT Identifier"; Code[10])
+        field(250; "VAT Identifier"; Code[20])
         {
             Caption = 'VAT Identifier';
             Editable = false;
@@ -238,12 +237,10 @@ Table 25006230 "Rent Billing Worksheet Line"
             Editable = false;
 
         }
-        field(300; "VAT Calculation Type"; Option)
+        field(300; "VAT Calculation Type"; Enum "Tax Calculation Type")
         {
             Caption = 'VAT Calculation Type';
             Editable = false;
-            OptionCaption = 'Normal VAT,Reverse Charge VAT,Full VAT,Sales Tax';
-            OptionMembers = "Normal VAT","Reverse Charge VAT","Full VAT","Sales Tax";
         }
         field(310; "VAT %"; Decimal)
         {
@@ -463,11 +460,9 @@ Table 25006230 "Rent Billing Worksheet Line"
         {
             Caption = 'Invoice Period Ending Date';
         }
-        field(3020; "Rent Type"; Option)
+        field(3020; "Rent Type"; Enum "Rent Type")
         {
             Caption = 'Rent Type';
-            OptionCaption = 'Set End Date,Open End Date';
-            OptionMembers = "Set End Date","Open End Date";
         }
         field(3030; "Sell-to Customer Name"; Text[100])
         {
@@ -491,11 +486,9 @@ Table 25006230 "Rent Billing Worksheet Line"
             TableRelation = Customer.Name;
             ValidateTableRelation = false;
         }
-        field(3070; "Overtime Calculation"; Option)
+        field(3070; "Overtime Calculation"; enum "Rent Overtime Calculation")
         {
             DataClassification = ToBeClassified;
-            OptionCaption = ' ,Total Period,Current Period';
-            OptionMembers = " ","Total Period","Current Period";
         }
         field(3080; "Unit of Measure Code"; Code[10])
         {
@@ -507,11 +500,9 @@ Table 25006230 "Rent Billing Worksheet Line"
             Caption = 'Extra Charge Line';
 
         }
-        field(3100; Type; Option)
+        field(3100; Type; Enum "Sales Line Type")
         {
             Caption = 'Type';
-            OptionCaption = ' ,G/L Account,Item,Resource,Fixed Asset,Charge (Item),External Service';
-            OptionMembers = " ","G/L Account",Item,Resource,"Fixed Asset","Charge (Item)","External Service";
         }
         field(3110; "No."; Code[20])
         {
@@ -800,9 +791,24 @@ Table 25006230 "Rent Billing Worksheet Line"
         end else begin
             RentWrkshtLine."VF Run 3 From" := RentLineFrom."VF Run 3 From";
         end;
-
-
     end;
 
+    procedure SetStyle() Style: Text
+    var
+        IsHandled: Boolean;
+    begin
+        OnBeforeSetStyle(Style, IsHandled);
+        if IsHandled Then
+            exit(Style);
+
+        if Rec."Extra Charge Line" then
+            exit('Unfavorable');
+        exit('');
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSetStyle(var Style: Text; var IsHandled: Boolean)
+    begin
+    end;
 }
 

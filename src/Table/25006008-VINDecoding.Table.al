@@ -338,7 +338,6 @@ Table 25006008 "VIN Decoding"
         intParent := FindMakeCode(recVehicle);
         CheckVINLenght(recVehicle, intParent);
         if intParent <> -1 then
-        
             FindChilds(recVehicle, intParent);
     end;
 
@@ -393,6 +392,7 @@ Table 25006008 "VIN Decoding"
     begin
         recVINDecoding.Reset;
         recVINDecoding.SetRange("Primary Entry", true);
+        OnBeforeFindVINDecoding(recVINDecoding, recVehicle);
         if recVINDecoding.FindSet then
             repeat
                 if CheckValues(recVehicle, recVINDecoding) then begin
@@ -597,6 +597,11 @@ Table 25006008 "VIN Decoding"
             codVehiclePosVal := codVehiclePosVal + CopyStr(recVehicle.VIN, intValue, 1);
         end;
         exit(codVehiclePosVal);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeFindVINDecoding(var recVINDecoding: Record "VIN Decoding"; recVehicle: Record Vehicle)
+    begin
     end;
 }
 

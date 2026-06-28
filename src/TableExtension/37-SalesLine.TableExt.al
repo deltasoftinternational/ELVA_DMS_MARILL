@@ -1283,9 +1283,11 @@ tableextension 25006033 "Sales Line" extends "Sales Line" //37
         ReservationEntry2: Record "Reservation Entry";
         ItemCost2: Decimal;
         lSalesHeader: Record "Sales Header";
+        handled: Boolean;
     begin
         //ActioType = 0 => Value validation
         //ActioType = 1 => Document Release
+        onBeforeApplyMarkupRestrictions(ActionType, handled);
 
         if (Type <> Type::Item) or ("Quantity (Base)" = 0) then
             exit;
@@ -1304,12 +1306,15 @@ tableextension 25006033 "Sales Line" extends "Sales Line" //37
         if UserSetup."Item Markup Restriction Group" = '' then
             exit;
 
-        ItemMarkupRestriction.Reset;
-        ItemMarkupRestriction.SetFilter("Group Code", '%1|''''', UserSetup."Item Markup Restriction Group");
-        ItemMarkupRestriction.SetFilter("Customer Price Group", '%1|''''', "Customer Price Group");
-        ItemMarkupRestriction.SetFilter("Item Category Code", '%1|''''', "Item Category Code");
-        if ItemMarkupRestriction.IsEmpty then
-            exit;
+        onBeforefilterItemMarkupRestriction(ItemMarkupRestriction, rec, UserSetup."Item Markup Restriction Group", handled);
+        if not handled then begin
+            ItemMarkupRestriction.Reset;
+            ItemMarkupRestriction.SetFilter("Group Code", '%1|''''', UserSetup."Item Markup Restriction Group");
+            ItemMarkupRestriction.SetFilter("Customer Price Group", '%1|''''', "Customer Price Group");
+            ItemMarkupRestriction.SetFilter("Item Category Code", '%1|''''', "Item Category Code");
+            if ItemMarkupRestriction.IsEmpty then
+                exit;
+        end;
 
 
 
@@ -2197,6 +2202,15 @@ tableextension 25006033 "Sales Line" extends "Sales Line" //37
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure onBeforefilterItemMarkupRestriction(var ItemMarkupRestriction: Record "Item Markup Restriction"; Rec: record "sales line"; "Item Markup Restriction Group": code[20]; var ishandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure onBeforeApplyMarkupRestrictions(var actiontype: Integer; var handled: Boolean)
+    begin
+    end;
 
 
     var

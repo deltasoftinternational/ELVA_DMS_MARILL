@@ -5,10 +5,9 @@ Table 25006618 "Rent Header"
 
     fields
     {
-        field(10; "Document Type"; Option)
+        field(10; "Document Type"; Enum "Rent Document Type")
         {
             Caption = 'Document Type';
-            OptionMembers = Quote,"Order","Return Order";
         }
         field(20; "No."; Code[20])
         {
@@ -25,11 +24,9 @@ Table 25006618 "Rent Header"
                     end
             end;
         }
-        field(25; "Rent Type"; Option)
+        field(25; "Rent Type"; Enum "Rent Type")
         {
             Caption = 'Rent Type';
-            OptionCaption = 'Set End Date,Open End Date';
-            OptionMembers = "Set End Date","Open End Date";
             trigger OnValidate()
             var
                 RentLine: Record "Rent Line";
@@ -95,12 +92,10 @@ Table 25006618 "Rent Header"
         {
             Caption = 'Due Date';
         }
-        field(95; Status; Option)
+        field(95; Status; Enum "Rent Document Status")
         {
             Caption = 'Status';
             Editable = false;
-            OptionCaption = 'Open,Released';
-            OptionMembers = Open,Released,"Pending Approval","Pending Prepayment";
         }
         field(97; "Document Status"; Code[20])
         {
@@ -251,6 +246,7 @@ Table 25006618 "Rent Header"
             trigger OnValidate()
             var
                 RentItemLine: Record "Rent Sales Line";
+                IsHandled: Boolean;
             begin
                 TestField(Status, Status::Open);
                 if (xRec."Bill-to Customer No." <> "Bill-to Customer No.") and
@@ -349,11 +345,12 @@ Table 25006618 "Rent Header"
                 Validate("Payment Terms Code");
                 Validate("Payment Method Code");
                 Validate("Currency Code");
-
-                if (xRec."Sell-to Customer No." = "Sell-to Customer No.") and
-                   (xRec."Bill-to Customer No." <> "Bill-to Customer No.")
-                then
-                    RecreateSalesLines(FieldCaption("Bill-to Customer No."));
+                OnBeforeRecreateSalesLinesOnBillToCustomerNoChange(xRec, Rec, Cust, IsHandled);
+                if not IsHandled then
+                    if (xRec."Sell-to Customer No." = "Sell-to Customer No.") and
+                       (xRec."Bill-to Customer No." <> "Bill-to Customer No.")
+                    then
+                        RecreateSalesLines(FieldCaption("Bill-to Customer No."));
 
                 if not SkipBillToContact then
                     UpdateBillToCont("Bill-to Customer No.");
@@ -361,6 +358,7 @@ Table 25006618 "Rent Header"
                 //>>DELTA XX
                 OnAfterValidateBillToCustomerNo(rec, Cust);
                 //<<DELTA XX
+
                 CreateDim(
                   Database::Customer, "Bill-to Customer No.",
                   Database::"Salesperson/Purchaser", "Salesperson Code",
@@ -563,8 +561,10 @@ Table 25006618 "Rent Header"
             var
                 Customer: Record Customer;
             begin
+
                 if ShouldLookForCustomerByName("Sell-to Customer No.") then
                     Validate("Sell-to Customer No.", Customer.GetCustNo("Sell-to Customer Name"));
+
             end;
         }
         field(320; "Sell-to Customer Name 2"; Text[50])
@@ -1124,11 +1124,9 @@ Table 25006618 "Rent Header"
         {
             Caption = 'VAT Registration No.';
         }
-        field(550; "Shipping Advice"; Option)
+        field(550; "Shipping Advice"; Enum "Sales Header Shipping Advice")
         {
             Caption = 'Shipping Advice';
-            OptionCaption = 'Partial,Complete';
-            OptionMembers = Partial,Complete;
 
             trigger OnValidate()
             begin
@@ -1420,11 +1418,9 @@ Table 25006618 "Rent Header"
         {
             Caption = 'Combine Shipments';
         }
-        field(680; Reserve; Option)
+        field(680; Reserve; Enum "Reserve Method")
         {
             Caption = 'Reserve';
-            OptionCaption = 'Never,Optional,Always';
-            OptionMembers = Never,Optional,Always;
         }
         field(690; "Prepayment %"; Decimal)
         {
@@ -1505,7 +1501,7 @@ Table 25006618 "Rent Header"
                 RentHeader := Rec;
                 SalesSetup.Get;
                 SalesSetup.TestField("Posted Shipment Nos.");
-                if NoSeriesMgt.LookupRelatedNoSeries(SalesSetup."Posted Shipment Nos.", RentHeader."Shipping No. Series") then
+                if cuNoSeries.LookupRelatedNoSeries(SalesSetup."Posted Shipment Nos.", RentHeader."Shipping No. Series") then
                     RentHeader.Validate("Shipping No. Series");
                 Rec := RentHeader;
             end;
@@ -1515,7 +1511,7 @@ Table 25006618 "Rent Header"
                 if "Shipping No. Series" <> '' then begin
                     SalesSetup.Get;
                     SalesSetup.TestField("Posted Shipment Nos.");
-                    NoSeriesMgt.TestAreRelated(SalesSetup."Posted Shipment Nos.", "Shipping No. Series");
+                    cuNoSeries.TestAreRelated(SalesSetup."Posted Shipment Nos.", "Shipping No. Series");
                 end;
                 TestField("Shipping No.", '');
             end;
@@ -1534,7 +1530,7 @@ Table 25006618 "Rent Header"
                 RentHeader := Rec;
                 SalesSetup.Get;
                 SalesSetup.TestField("Posted Return Receipt Nos.");
-                if NoSeriesMgt.LookupRelatedNoSeries(SalesSetup."Posted Return Receipt Nos.", RentHeader."Return Receipt No. Series") then
+                if cuNoSeries.LookupRelatedNoSeries(SalesSetup."Posted Return Receipt Nos.", RentHeader."Return Receipt No. Series") then
                     RentHeader.Validate("Return Receipt No. Series");
                 Rec := RentHeader;
             end;
@@ -1544,7 +1540,7 @@ Table 25006618 "Rent Header"
                 if "Return Receipt No. Series" <> '' then begin
                     SalesSetup.Get;
                     SalesSetup.TestField("Posted Return Receipt Nos.");
-                    NoSeriesMgt.TestAreRelated(SalesSetup."Posted Return Receipt Nos.", "Return Receipt No. Series");
+                    cuNoSeries.TestAreRelated(SalesSetup."Posted Return Receipt Nos.", "Return Receipt No. Series");
                 end;
                 TestField("Return Receipt No.", '');
             end;
@@ -1567,7 +1563,7 @@ Table 25006618 "Rent Header"
                 RentHeader := Rec;
                 SalesSetup.Get;
                 SalesSetup.TestField("Posted Prepmt. Inv. Nos.");
-                if NoSeriesMgt.LookupRelatedNoSeries(SalesSetup."Posted Prepmt. Inv. Nos.", RentHeader."Prepayment No. Series") then
+                if cuNoSeries.LookupRelatedNoSeries(SalesSetup."Posted Prepmt. Inv. Nos.", RentHeader."Prepayment No. Series") then
                     RentHeader.Validate("Prepayment No. Series");
                 Rec := RentHeader;
             end;
@@ -1577,7 +1573,7 @@ Table 25006618 "Rent Header"
                 if "Prepayment No. Series" <> '' then begin
                     SalesSetup.Get;
                     SalesSetup.TestField("Posted Prepmt. Inv. Nos.");
-                    NoSeriesMgt.TestAreRelated(SalesSetup."Posted Prepmt. Inv. Nos.", "Prepayment No. Series");
+                    cuNoSeries.TestAreRelated(SalesSetup."Posted Prepmt. Inv. Nos.", "Prepayment No. Series");
                 end;
                 TestField("Prepayment No.", '');
             end;
@@ -1592,7 +1588,7 @@ Table 25006618 "Rent Header"
                 RentHeader := Rec;
                 SalesSetup.Get;
                 SalesSetup.TestField("Posted Prepmt. Cr. Memo Nos.");
-                if NoSeriesMgt.LookupRelatedNoSeries(GetPostingNoSeriesCode(), RentHeader."Prepmt. Cr. Memo No.") then
+                if cuNoSeries.LookupRelatedNoSeries(GetPostingNoSeriesCode, RentHeader."Prepmt. Cr. Memo No.") then
                     RentHeader.Validate("Prepmt. Cr. Memo No.");
                 Rec := RentHeader;
             end;
@@ -1602,7 +1598,7 @@ Table 25006618 "Rent Header"
                 if "Prepmt. Cr. Memo No." <> '' then begin
                     SalesSetup.Get;
                     SalesSetup.TestField("Posted Prepmt. Cr. Memo Nos.");
-                    NoSeriesMgt.TestAreRelated(SalesSetup."Posted Prepmt. Cr. Memo Nos.", "Prepmt. Cr. Memo No.");
+                    cuNoSeries.TestAreRelated(SalesSetup."Posted Prepmt. Cr. Memo Nos.", "Prepmt. Cr. Memo No.");
                 end;
                 TestField("Prepmt. Cr. Memo No.", '');
             end;
@@ -1792,7 +1788,7 @@ Table 25006618 "Rent Header"
                     UpdateSalesLines(FieldCaption("Outbound Whse. Handling Time"), CurrFieldNo <> 0);
             end;
         }
-        field(1010; "Rent Quote No."; Code[10])
+        field(1010; "Rent Quote No."; Code[20])
         {
             Caption = 'Rent Quote No.';
             Editable = false;
@@ -1872,11 +1868,9 @@ Table 25006618 "Rent Header"
             Caption = 'Deposit Amount';
         }
 
-        field(1090; "Overtime Calculation"; Option)
+        field(1090; "Overtime Calculation"; Enum "Rent Overtime Calculation")
         {
             DataClassification = ToBeClassified;
-            OptionCaption = ' ,Total Period,Current Period';
-            OptionMembers = " ","Total Period","Current Period";
         }
         field(1200; "External Document No."; Code[35])
         {
@@ -1973,8 +1967,11 @@ Table 25006618 "Rent Header"
         RentSetup.Get;
         if "No." = '' then begin
             TestNoSeries;
-            "No. Series" := GetNoSeriesCode();
-            "No." := NoSeriesMgt.GetNextNo("No. Series", "Posting Date", true);
+            if cuNoSeries.AreRelated(GetNoSeriesCode, xRec."No. Series") then
+                "No. Series" := xRec."No. Series"
+            else
+                "No. Series" := GetNoSeriesCode;
+            "No." := cuNoSeries.GetNextNo("No. Series");
         end;
 
         if "Overtime Calculation" = "Overtime Calculation"::" " then
@@ -2016,7 +2013,7 @@ Table 25006618 "Rent Header"
         CompanyInfo: Record "Company Information";
         CurrExchRate: Record "Currency Exchange Rate";
         SalesLineReserve: Codeunit "Sales Line-Reserve";
-        NoSeriesMgt: Codeunit "No. Series";
+        cuNoSeries: Codeunit "No. Series";
         DimMgt: Codeunit DimensionManagement;
         TransferExtendedText: Codeunit "Transfer Extended Text";
         UserMgt: Codeunit "User Setup Management";
@@ -2115,15 +2112,13 @@ Table 25006618 "Rent Header"
         RentHeader := Rec;
         RentSetup.Get;
         RentSetup.TestField("Order Nos.");
-        if NoSeriesMgt.LookupRelatedNoSeries(RentSetup."Order Nos.", OldRentHeader."No. Series", RentHeader."No. Series") then begin
+        if cuNoSeries.LookupRelatedNoSeries(RentSetup."Order Nos.", OldRentHeader."No. Series", RentHeader."No. Series") then begin
             if (RentHeader."Sell-to Customer No." = '') and (RentHeader."Sell-to Contact No." = '') then begin
                 HideCreditCheckDialogue := false;
                 RentHeader.CheckCreditMaxBeforeInsert;
                 HideCreditCheckDialogue := true;
             end;
-            RentSetup.Get;
-            RentSetup.TestField("Rent Item Nos.");
-            RentHeader."No." := NoSeriesMgt.GetNextNo(RentHeader."No. Series", WorkDate(), true);
+            RentHeader."No." := cuNoSeries.GetNextNo(RentHeader."No. Series");
             Rec := RentHeader;
             exit(true);
         end;
@@ -2163,8 +2158,7 @@ Table 25006618 "Rent Header"
                         "Posting No." := "No.";
                         "Posting No. Series" := "No. Series"
                     end else begin
-                        if NoSeriesMgt.IsAutomatic(RentSetup."Posted Order Nos.") then
-                            "Posting No. Series" := RentSetup."Posted Order Nos.";
+                        "Posting No. Series" := RentSetup."Posted Order Nos.";
                     end;
                 end;
             "document type"::"Return Order":
@@ -2173,8 +2167,7 @@ Table 25006618 "Rent Header"
                         "Posting No." := "No.";
                         "Posting No. Series" := "No. Series"
                     end else begin
-                        if NoSeriesMgt.IsAutomatic(RentSetup."Posted Return Order Nos.") then
-                            "Posting No. Series" := RentSetup."Posted Return Order Nos.";
+                        "Posting No. Series" := RentSetup."Posted Return Order Nos.";
                     end;
                 end;
         end;
@@ -2302,6 +2295,7 @@ Table 25006618 "Rent Header"
                                 RentSalesLine.Validate("Variant Code", RentSalesLineTmp."Variant Code");
                                 if RentSalesLineTmp.Quantity <> 0 then
                                     RentSalesLine.Validate(Quantity, RentSalesLineTmp.Quantity);
+                                OnRecreateRentSalesLineOnQuantityChange(RentSalesLine, RentSalesLineTmp);
                                 RentSalesLine.Validate("Line Discount %", RentSalesLineTmp."Line Discount %");
                                 RentSalesLine."Purchase Order No." := RentSalesLineTmp."Purchase Order No.";
                                 RentSalesLine."Purch. Order Line No." := RentSalesLineTmp."Purch. Order Line No.";
@@ -3197,6 +3191,7 @@ Table 25006618 "Rent Header"
         NewDimSetID: Integer;
         RentLine: Record "Rent Line";
         RentSalesLine: Record "Rent Sales Line";
+        IsHandled: Boolean;
     begin
         // Update all lines with changed dimensions.
 
@@ -3206,14 +3201,18 @@ Table 25006618 "Rent Header"
             exit;
         if not (RentLinesExist() or SalesLinesExist()) then
             exit;
-        if not Confirm(Text064) then
-            exit;
+
+        OnBeforeConfirmKeepExistingDimensions(Rec, IsHandled);
+        if not IsHandled then
+            if not Confirm(Text064) then
+                exit;
+
 
         RentLine.Reset;
         RentLine.SetRange("Document Type", "Document Type");
         RentLine.SetRange("Document No.", "No.");
         RentLine.LockTable;
-        if RentLine.FindSet(true, false) then
+        if RentLine.FindSet(true) then
             repeat
                 NewDimSetID := DimMgt.GetDeltaDimSetID(RentLine."Dimension Set ID", NewParentDimSetID, OldParentDimSetID);
                 if RentLine."Dimension Set ID" <> NewDimSetID then begin
@@ -3228,7 +3227,7 @@ Table 25006618 "Rent Header"
         RentSalesLine.SetRange("Document Type", "Document Type");
         RentSalesLine.SetRange("Document No.", "No.");
         RentSalesLine.LockTable;
-        if RentSalesLine.FindSet(true, false) then
+        if RentSalesLine.FindSet(true) then
             repeat
                 NewDimSetID := DimMgt.GetDeltaDimSetID(RentSalesLine."Dimension Set ID", NewParentDimSetID, OldParentDimSetID);
                 if RentSalesLine."Dimension Set ID" <> NewDimSetID then begin
@@ -3319,10 +3318,12 @@ Table 25006618 "Rent Header"
         RentSalesLineToCheck: Record "Rent Sales Line";
         RentTransferLineToCheck: Record "Rent Transfer Line";
         RentLedgerEntryToCheck: Record "Rent Ledger Entry";
+        Ishandled: Boolean;
     begin
         RentLineToCheck.Reset;
         RentLineToCheck.SetRange("Document Type", "Document Type");
         RentLineToCheck.SetRange("Document No.", "No.");
+        OnBeforeCheckCloseRentOrderAddFilter(RentLineToCheck);
         if RentLineToCheck.FindSet then
             repeat
                 if RentLineToCheck.Status <> RentLineToCheck.Status::Returned then
@@ -3332,9 +3333,13 @@ Table 25006618 "Rent Header"
                         if RentLineToCheck."Manual Invoicing End Date" > RentLineToCheck."Last Date Invoiced" then
                             Error(CloseCheckRentLineNotInvoiced, RentLineToCheck."Line No.", RentLineToCheck."Rent Asset No.", RentLineToCheck."Rent Item No.")
                     end else begin
-                        RentLineToCheck.CalcFields("Actual Return Date");
-                        if RentLineToCheck."Actual Return Date" > RentLineToCheck."Last Date Invoiced" then
-                            Error(CloseCheckRentLineNotInvoiced, RentLineToCheck."Line No.", RentLineToCheck."Rent Asset No.", RentLineToCheck."Rent Item No.");
+                        OnBeforeCheckLastDateInvoiced(IsHandled, RentLineToCheck);
+                        If not Ishandled then begin
+                            RentLineToCheck.CalcFields("Actual Return Date");
+                            if RentLineToCheck."Actual Return Date" > RentLineToCheck."Last Date Invoiced" then
+                                Error(CloseCheckRentLineNotInvoiced, RentLineToCheck."Line No.", RentLineToCheck."Rent Asset No.", RentLineToCheck."Rent Item No.");
+                        end;
+
                     end;
 
             //if RentLineToCheck.Quantity > RentLineToCheck."Quantity Invoiced" then
@@ -3359,7 +3364,7 @@ Table 25006618 "Rent Header"
         RentLedgerEntryToCheck.SetFilter("Outstanding Qty.", '>0');
         if RentLedgerEntryToCheck.FindFirst then
             Error(CloseCheckNotReturned, RentLedgerEntryToCheck."Rent Asset No.");
-
+        OnBeforeCloseRentOrder(rec);
         Closed := true;
         RentLine.Reset();
         RentLine.SetRange("Document No.", "No.");
@@ -3451,8 +3456,6 @@ Table 25006618 "Rent Header"
         exit(TypeHelper.ReadAsTextWithSeparator(InStream, TypeHelper.LFSeparator));
     end;
 
-
-
     [IntegrationEvent(false, false)]
     local procedure OnBeforeRename(var RentHeader: Record "Rent Header"; var IsHandled: Boolean; xRentHeader: Record "Rent Header")
     begin
@@ -3460,6 +3463,36 @@ Table 25006618 "Rent Header"
     //>>DELTA XX
     [IntegrationEvent(false, false)]
     local procedure OnAfterValidateBillToCustomerNo(var RentHeader: Record "Rent Header"; var Cust: Record Customer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckLastDateInvoiced(var IsHandled: Boolean; RentLineToCheck: Record "Rent Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnRecreateRentSalesLineOnQuantityChange(Var RentSalesLine: Record "Rent Sales Line"; var RentSalesLineTmp: Record "Rent Sales Line" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeRecreateSalesLinesOnBillToCustomerNoChange(xRec: Record "Rent Header"; Rec: Record "Rent Header"; Cust: Record Customer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCloseRentOrder(var rec: Record "Rent Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeConfirmKeepExistingDimensions(Rec: Record "Rent Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckCloseRentOrderAddFilter(Var RentLineToCheck: Record "Rent Line")
     begin
     end;
     //<<DELTA XX    

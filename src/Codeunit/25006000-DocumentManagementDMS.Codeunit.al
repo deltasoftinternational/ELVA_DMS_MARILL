@@ -3107,6 +3107,7 @@ Codeunit 25006000 "DocumentManagementDMS"
             Servdoctypeedms::"Posted Order":
                 begin
                     FromPstServOrdHeader.Get(FromDocNo);
+                    OnBeforeTransferFieldsFromPstServOrdHeader(FromPstServOrdHeader);
                     if not IncludeHeader then begin
                         FromPstServOrdHeader.TestField("Sell-to Customer No.", ToServOrdHeader."Sell-to Customer No.");
                         FromPstServOrdHeader.TestField("Bill-to Customer No.", ToServOrdHeader."Bill-to Customer No.");
@@ -3313,6 +3314,8 @@ Codeunit 25006000 "DocumentManagementDMS"
     end;
 
     procedure CopyServOrdLine(ToServOrdHeader: Record "Service Header EDMS"; var ToServOrdLine: Record "Service Line EDMS"; var FromServOrdLine: Record "Service Line EDMS"): Boolean
+    var
+        IsHandled: Boolean;
     begin
         ToServOrdLine := FromServOrdLine;
         ToServOrdLine."Document Type" := ToServOrdHeader."Document Type";
@@ -3341,7 +3344,9 @@ Codeunit 25006000 "DocumentManagementDMS"
         ToServOrdLine.InitOutstanding;
         //28.07.2008. EDMS P2 <<
 
-        ToServOrdLine.Insert(true);
+        OnBeforeInsertToServiceLine(ToServOrdHeader, ToServOrdLine, ToServOrdHeader."Document Type", ToServOrdHeader."No.", IsHandled);
+        if not IsHandled then
+            ToServOrdLine.Insert(true);
 
         exit(true);
     end;
@@ -4278,4 +4283,13 @@ Codeunit 25006000 "DocumentManagementDMS"
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeInsertToServiceLine(var ToServOrdHeader: Record "Service Header EDMS"; var ToServOrdLine: Record "Service Line EDMS"; OldDocType: Option; OldDocNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeTransferFieldsFromPstServOrdHeader(var FromPstServOrdHeader: Record "Posted Serv. Order Header")
+    begin
+    end;
 }

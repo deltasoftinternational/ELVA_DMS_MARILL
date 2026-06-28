@@ -679,6 +679,7 @@ Report 25006108 "BLS Calculate Services"
         BaseQty: Decimal;
         x: Decimal;
         BLSCalculationWorksheetLine: Record "BLS Calculation Worksheet Line";
+        Ishandled: Boolean;
     begin
         if not ServiceInFilter(ContractService."Service Code") then
             exit;
@@ -693,7 +694,9 @@ Report 25006108 "BLS Calculate Services"
             CalcToDate := ContractService."Ending Date";
         if (CalcFromDate > CalcToDate) then
             exit;
-
+        OnBeforeProcessContractServiceDMS(Contract, ContractService, CalcFromDate, CalcToDate, Ishandled);
+        if Ishandled then
+            exit;
         CalcPrice := 0;
         BasePrice := 0;
         if ContractService."Price Source" = ContractService."price source"::Contract then begin
@@ -1356,6 +1359,11 @@ Report 25006108 "BLS Calculate Services"
         CalcLedgEntry.CalcSums(Quantity);
 
         exit(TempQtyBuffer.Quantity + CalcLedgEntry.Quantity + CalcWorksheetLine.Quantity);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeProcessContractServiceDMS(var ContractDMS: Record Contract; Var ContractService: Record "DMS Contract Line"; CalcFromDate: Date; CalcToDate: Date; var Ishandled: Boolean)
+    begin
     end;
 }
 

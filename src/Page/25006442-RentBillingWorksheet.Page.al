@@ -31,6 +31,7 @@ Page 25006442 "Rent Billing Worksheet"
                     ApplicationArea = Basic;
                     Caption = 'Rent Order No.';
                     Editable = RowEditable;
+                    StyleExpr = StyleTxt;
                 }
                 field(RentType; Rec."Rent Type")
                 {
@@ -113,6 +114,7 @@ Page 25006442 "Rent Billing Worksheet"
                 {
                     ApplicationArea = Basic;
                     Editable = RowEditable;
+                    StyleExpr = StyleTxt;
                 }
                 field("Rent Line Description"; Rec."Rent Line Description")
                 {
@@ -502,6 +504,9 @@ Page 25006442 "Rent Billing Worksheet"
                     RentWkshtLines.Reset();
                     //RentWkshtLines.SetRange("To Invoice", true);
                     RentWkshtLines.SetRange("Process Line", true);
+                    //>>DELTA XX
+                    OnApplyingFilterOnRentWkshtLinesForSingleInvoice(RentWkshtLines);
+                    //DELTA XX
                     RentOrdersCombined.DeleteAll();
                     if RentWkshtLines.FindFirst() then
                         repeat
@@ -596,7 +601,12 @@ Page 25006442 "Rent Billing Worksheet"
                                             else
                                                 RentLine."Qty. to Invoice" := 0;
 
-                                            RentLine."Last Date Invoiced" := RentSalesLine."End Date";
+                                            //>>DELTA XX
+                                            IsHandled := false;
+                                            OnBeforeUpdateLastInvoiceDateForSingleInvoices(ishandled);
+                                            if IsHandled = false then
+                                                //<<DELTA XX
+                                                RentLine."Last Date Invoiced" := RentSalesLine."End Date";
                                             RentLine.Modify;
                                         end;
                                     end;
@@ -629,6 +639,9 @@ Page 25006442 "Rent Billing Worksheet"
                     //Delete processed worksheet lines
                     RentWkshtLines.Reset();
                     //RentWkshtLines.SetRange("To Invoice", true);
+                    //>>DELTA XX
+                    OnApplyingFilterOnRentWkshtLinesForSingleInvoice(RentWkshtLines);
+                    //DELTA XX
                     RentWkshtLines.SetRange("Process Line", true);
                     if RentWkshtLines.FindFirst() then
                         repeat
@@ -675,6 +688,9 @@ Page 25006442 "Rent Billing Worksheet"
                     RentWkshtLines.Reset();
                     //RentWkshtLines.SetRange("To Invoice", true);
                     RentWkshtLines.SetRange("Process Line", true);
+                    //>>DELTA XX
+                    OnApplyingFilterOnRentWkshtLinesForCombinedInvoices(RentWkshtLines);
+                    //DELTA XX
                     if RentWkshtLines.FindFirst() then
                         repeat
                             if RentLine.Get(RentWkshtLines."Document Type", RentWkshtLines."Document No.", RentWkshtLines."Line No.") then begin
@@ -770,8 +786,12 @@ Page 25006442 "Rent Billing Worksheet"
                                                 RentLine."Qty. to Invoice" := RentLine.Quantity - RentLine."Quantity Invoiced"
                                             else
                                                 RentLine."Qty. to Invoice" := 0;
-
-                                            RentLine."Last Date Invoiced" := RentSalesLine."End Date";
+                                            //>>DELTA XX
+                                            IsHandled := false;
+                                            OnBeforeUpdateLastInvoiceDateForCombinedInvoices(ishandled);
+                                            if IsHandled = false then
+                                                //<<DELTA XX
+                                                RentLine."Last Date Invoiced" := RentSalesLine."End Date";
                                             RentLine.Modify;
                                         end;
                                     end;
@@ -824,6 +844,9 @@ Page 25006442 "Rent Billing Worksheet"
 
                     RentWkshtLines.Reset();
                     RentWkshtLines.SetRange("Process Line", true);
+                    //>>DELTA XX
+                    OnApplyingFilterOnRentWkshtLinesForCombinedInvoices(RentWkshtLines);
+                    //DELTA XX
                     //RentWkshtLines.SetRange("To Invoice", true);
                     if RentWkshtLines.FindFirst() then
                         repeat
@@ -857,7 +880,8 @@ Page 25006442 "Rent Billing Worksheet"
         IsVFRun5Visible: Boolean;
         IsVFRun6Visible: Boolean;
         RowEditable: Boolean;
-
+        StyleTxt: Text;
+        IsHandled: Boolean;
 
     trigger OnOpenPage()
     begin
@@ -869,9 +893,36 @@ Page 25006442 "Rent Billing Worksheet"
         IsVFRun6Visible := Rec.IsVFActive(Rec.FieldNo("VF Run 3 To"));
     end;
 
+    trigger OnAfterGetRecord()
+    begin
+        StyleTxt := Rec.SetStyle();
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertRensSalesLine(var RentSalesLine: Record "Rent Sales Line"; RentBillWkshLine: Record "Rent Billing Worksheet Line")
     begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateLastInvoiceDateForSingleInvoices(var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateLastInvoiceDateForCombinedInvoices(var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnApplyingFilterOnRentWkshtLinesForSingleInvoice(Var RentWkshtLines: Record "Rent Billing Worksheet Line")
+    begin
+
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnApplyingFilterOnRentWkshtLinesForCombinedInvoices(Var RentWkshtLines: Record "Rent Billing Worksheet Line")
+    begin
+
     end;
 
 }

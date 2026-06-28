@@ -44,6 +44,13 @@ Codeunit 25006609 "Release Rent Document"
 
         Rec.Modify(true);
         Commit;
+        OnAfterReleaseRentOrder(Rec);
+    end;
+
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterReleaseRentOrder(var RentHeader: Record "Rent Header")
+    begin
     end;
 
     var
@@ -96,8 +103,6 @@ Codeunit 25006609 "Release Rent Document"
         ApprovedOnly: Boolean;
     begin
         case RentHeader.Status of
-            RentHeader.Status::"Pending Approval":
-                Codeunit.Run(Codeunit::"Release Rent Document", RentHeader);
             RentHeader.Status::Released:
                 Codeunit.Run(Codeunit::"Release Rent Document", RentHeader);
             RentHeader.Status::Open:
@@ -109,7 +114,7 @@ Codeunit 25006609 "Release Rent Document"
     procedure PerformManualReopen(var RentHeader: Record "Rent Header")
     begin
         case RentHeader.Status of
-            RentHeader.Status::Open, RentHeader.Status::Released, RentHeader.Status::"Pending Prepayment":
+            RentHeader.Status::Open, RentHeader.Status::Released:
                 Reopen(RentHeader);
         end;
     end;

@@ -1290,6 +1290,7 @@ then
 
 
             until SalesLine.Next = 0;
+            OnAfterUpdateUnitPrice(SalesHeader);
         end;
     end;
 
@@ -1529,6 +1530,11 @@ then
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdatePurchLineAmountsOnBeforeFind(var PurchaseLine: Record "Purchase Line"; var NewVehAssembly: Record "Vehicle Assembly Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterUpdateUnitPrice(var SalesHeader: Record "Sales Header")
     begin
     end;
 }

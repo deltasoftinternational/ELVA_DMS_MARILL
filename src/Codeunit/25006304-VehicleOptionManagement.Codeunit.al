@@ -228,6 +228,7 @@ Codeunit 25006304 "VehicleOptionManagement"
                         VehAssembly1.Validate("Option Code", VehOptLedger."Option Code");
                     VehAssembly1."Cost Amount" := VehOptLedger."Cost Amount (LCY)";
                     VehAssembly1.Posted := true;
+                    OnBeforeInsertVehAssembly(VehAssembly1, VehOptLedger);
                     if VehAssembly1.Insert then;
                 end;
             until VehOptLedger.Next = 0;
@@ -813,6 +814,11 @@ Codeunit 25006304 "VehicleOptionManagement"
                 PostedVehicleAssemblyLine."Source No." := SourceNo;
                 PostedVehicleAssemblyLine.Insert;
             until VehicleAssemblyLine.Next = 0;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeInsertVehAssembly(var VehAssembly1: Record "Vehicle Assembly Line"; var VehOptLedger: Record "Vehicle Opt. Ledger Entry")
+    begin
     end;
 }
 
