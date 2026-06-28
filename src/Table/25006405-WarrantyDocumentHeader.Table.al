@@ -529,6 +529,11 @@ Table 25006405 "Warranty Document Header"
 
             end;
         }
+        field(5000; Closed; Boolean)
+        {
+            Caption = 'Closed';
+            DataClassification = ToBeClassified;
+        }
         field(51200; "Total Amount"; Decimal)
         {
             CalcFormula = sum("Warranty Document Line".Amount where("Document No." = field("No.")));
@@ -964,6 +969,21 @@ Table 25006405 "Warranty Document Header"
     begin
         Clear(VFMgt);
         exit(VFMgt.IsVFActive(Database::"Warranty Document Header", FieldNo));
+    end;
+
+    procedure CloseWarrantyDocument()
+    var
+        WarrantyLine: Record "Warranty Document Line";
+    begin
+        Closed := true;
+        Modify;
+        WarrantyLine.Reset();
+        WarrantyLine.SetRange("Document No.", "No.");
+        if WarrantyLine.FindFirst() then
+            repeat
+                WarrantyLine.Closed := true;
+                WarrantyLine.Modify(false);
+            until WarrantyLine.Next = 0;
     end;
 }
 

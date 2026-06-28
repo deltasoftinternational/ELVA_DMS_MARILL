@@ -1,0 +1,358 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <AutoRefresh>0</AutoRefresh>
+  <DataSources>
+    <DataSource Name="DataSource">
+      <ConnectionProperties>
+        <DataProvider>SQL</DataProvider>
+        <ConnectString />
+      </ConnectionProperties>
+      <rd:SecurityType>None</rd:SecurityType>
+    </DataSource>
+  </DataSources>
+  <ReportSections>
+    <ReportSection>
+      <Body>
+        <Height>2in</Height>
+        <Style />
+      </Body>
+      <Width>6.5in</Width>
+      <Page>
+        <Style />
+      </Page>
+    </ReportSection>
+  </ReportSections>
+  <ReportParameters>
+    <ReportParameter Name="ReportTitleLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>ReportTitleLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>ReportTitleLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="TotalLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>TotalLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>TotalLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="TotalByLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>TotalByLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>TotalByLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="AssetNoLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>AssetNoLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>AssetNoLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="PostingDateLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>PostingDateLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>PostingDateLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="AssetDescriptionLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>AssetDescriptionLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>AssetDescriptionLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="PostDateLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>PostDateLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>PostDateLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="PageLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>PageLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>PageLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="NoCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>NoCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>NoCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="NameCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>NameCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>NameCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="VATRegistrationNoCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>VATRegistrationNoCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>VATRegistrationNoCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="No_RentHeaderCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>No_RentHeaderCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>No_RentHeaderCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="ContractNo_RentHeaderCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>ContractNo_RentHeaderCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>ContractNo_RentHeaderCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="RentType_RentHeaderCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>RentType_RentHeaderCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>RentType_RentHeaderCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="DealType_RentHeaderCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>DealType_RentHeaderCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>DealType_RentHeaderCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="DocumentDate_RentHeaderCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>DocumentDate_RentHeaderCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>DocumentDate_RentHeaderCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="DocumentNoCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>DocumentNoCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>DocumentNoCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="DocumentDateCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>DocumentDateCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>DocumentDateCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="RentOrderNoCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>RentOrderNoCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>RentOrderNoCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="AmountCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>AmountCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>AmountCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="AmountIncludingVATCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>AmountIncludingVATCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>AmountIncludingVATCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="RentItemNoCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>RentItemNoCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>RentItemNoCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="RentAssetNoCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>RentAssetNoCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>RentAssetNoCaption</Prompt>
+    </ReportParameter>
+  </ReportParameters>
+  <Code>Public Function BlankZero(ByVal Value As Decimal)
+    if Value = 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankPos(ByVal Value As Decimal)
+    if Value &gt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankZeroAndPos(ByVal Value As Decimal)
+    if Value &gt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNeg(ByVal Value As Decimal)
+    if Value &lt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNegAndZero(ByVal Value As Decimal)
+    if Value &lt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+</Code>
+  <Language>=User!Language</Language>
+  <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
+  <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <rd:ReportID>0eeb6585-38ae-40f1-885b-8d50088d51b4</rd:ReportID>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="ReportForNavId_41">
+          <DataField>ReportForNavId_41</DataField>
+        </Field>
+        <Field Name="CustomerFilters">
+          <DataField>CustomerFilters</DataField>
+        </Field>
+        <Field Name="No">
+          <DataField>No</DataField>
+        </Field>
+        <Field Name="Name">
+          <DataField>Name</DataField>
+        </Field>
+        <Field Name="VATRegistrationNo">
+          <DataField>VATRegistrationNo</DataField>
+        </Field>
+        <Field Name="ReportForNavId_1">
+          <DataField>ReportForNavId_1</DataField>
+        </Field>
+        <Field Name="RentHeaderFilters">
+          <DataField>RentHeaderFilters</DataField>
+        </Field>
+        <Field Name="No_RentHeader">
+          <DataField>No_RentHeader</DataField>
+        </Field>
+        <Field Name="ContractNo_RentHeader">
+          <DataField>ContractNo_RentHeader</DataField>
+        </Field>
+        <Field Name="RentType_RentHeader">
+          <DataField>RentType_RentHeader</DataField>
+        </Field>
+        <Field Name="DealType_RentHeader">
+          <DataField>DealType_RentHeader</DataField>
+        </Field>
+        <Field Name="DocumentDate_RentHeader">
+          <DataField>DocumentDate_RentHeader</DataField>
+        </Field>
+        <Field Name="ShowDetails">
+          <DataField>ShowDetails</DataField>
+        </Field>
+        <Field Name="ReportForNavId_2">
+          <DataField>ReportForNavId_2</DataField>
+        </Field>
+        <Field Name="CompName">
+          <DataField>CompName</DataField>
+        </Field>
+        <Field Name="RentLedgerFilters">
+          <DataField>RentLedgerFilters</DataField>
+        </Field>
+        <Field Name="DocumentNo">
+          <DataField>DocumentNo</DataField>
+        </Field>
+        <Field Name="DocumentDate">
+          <DataField>DocumentDate</DataField>
+        </Field>
+        <Field Name="RentOrderNo">
+          <DataField>RentOrderNo</DataField>
+        </Field>
+        <Field Name="Amount">
+          <DataField>Amount</DataField>
+        </Field>
+        <Field Name="AmountFormat">
+          <DataField>AmountFormat</DataField>
+        </Field>
+        <Field Name="AmountIncludingVAT">
+          <DataField>AmountIncludingVAT</DataField>
+        </Field>
+        <Field Name="AmountIncludingVATFormat">
+          <DataField>AmountIncludingVATFormat</DataField>
+        </Field>
+        <Field Name="RentItemNo">
+          <DataField>RentItemNo</DataField>
+        </Field>
+        <Field Name="RentAssetNo">
+          <DataField>RentAssetNo</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
+</Report>

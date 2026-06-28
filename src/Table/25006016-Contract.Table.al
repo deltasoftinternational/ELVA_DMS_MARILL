@@ -265,8 +265,8 @@ Table 25006016 "Contract"
         field(2000; "Document Profile"; Option)
         {
             Caption = 'Document Profile';
-            OptionCaption = ' ,Spare Parts Trade,,Service';
-            OptionMembers = " ","Spare Parts Trade",,Service;
+            OptionCaption = ' ,Spare Parts Trade,Vehicles Trade,Service,Rent';
+            OptionMembers = " ","Spare Parts Trade","Vehicles Trade",Service,Rent;
         }
         field(5043; "No. of Archived Versions"; Integer)
         {

@@ -6,10 +6,9 @@ Table 25006619 "Rent Line"
     fields
     {
 
-        field(10; "Document Type"; Option)
+        field(10; "Document Type"; enum "Rent Document Type")
         {
             Caption = 'Document Type';
-            OptionMembers = Quote,"Order";
         }
         field(20; "Document No."; Code[20])
         {
@@ -27,12 +26,13 @@ Table 25006619 "Rent Line"
             trigger OnValidate()
             var
                 DocumentDate: Date;
+                IsHandled: Boolean;
             begin
                 if "Quantity Invoiced" <> 0 then
                     Error(Err003);
 
-                if (Status = Status::Rented) or (Status = Status::Returned) or (Status = Status::"In Service") then
-                    Error(Err004);
+                //if (Status = Status::Rented) or (Status = Status::Returned) or (Status = Status::"In Service") then
+                //    Error(Err004);
 
                 if (xRec."Rent Item No." <> "Rent Item No.") and ("Rent Item No." <> '') then begin
                     RentItem.Get("Rent Item No.");
@@ -71,14 +71,16 @@ Table 25006619 "Rent Line"
                     "Shortcut Dimension 2 Code" := RentItem."Global Dimension 2 Code";
                 end;
 
-                If (not "Component Line") and ("Rent Asset No." = '') then begin
-                    RentItemRelation.Reset;
-                    RentItemRelation.SetRange(RentItemRelation."Rent Item No.", "Rent Item No.");
-                    if RentItemRelation.Count = 1 then begin
-                        RentItemRelation.Find('-');
-                        Validate("Rent Asset No.", RentItemRelation."Rent Asset No.");
+                OnBeforeGetRentAssetNo(rec, IsHandled);
+                if not Ishandled then
+                    If (not "Component Line") and ("Rent Asset No." = '') then begin
+                        RentItemRelation.Reset;
+                        RentItemRelation.SetRange(RentItemRelation."Rent Item No.", "Rent Item No.");
+                        if RentItemRelation.Count = 1 then begin
+                            RentItemRelation.Find('-');
+                            Validate("Rent Asset No.", RentItemRelation."Rent Asset No.");
+                        end;
                     end;
-                end;
 
 
                 CallCreateDim;
@@ -93,7 +95,7 @@ Table 25006619 "Rent Line"
             OptionCaption = ' ,Allocated,Rented,Returned,In Service';
             OptionMembers = " ","Allocated","Rented","Returned","In Service";
         }
-        field(80; Description; Text[50])
+        field(80; Description; Text[100])
         {
             Caption = 'Description';
         }
@@ -315,7 +317,10 @@ Table 25006619 "Rent Line"
 
             trigger OnValidate()
             begin
-                "Line Amount" := Quantity * "Unit Price" * "Rent Asset Quantity";
+                //RAMZI
+                GetRentHeader();
+                "Line Amount" := ROUND(Quantity * "Unit Price" * "Rent Asset Quantity", Currency."Amount Rounding Precision") - "Line Discount Amount";
+                //"Line Amount" := Quantity * "Unit Price" * "Rent Asset Quantity";
             end;
         }
         field(180; "Line Amount"; Decimal)
@@ -371,6 +376,7 @@ Table 25006619 "Rent Line"
 
             trigger OnValidate()
             begin
+                OnValidateLineDiscountPercentOnBeforeLineDiscountAmount(Rec, xRec, CurrFieldNo);
                 "Line Discount Amount" :=
                   ROUND(
                     ROUND(Quantity * "Unit Price", Currency."Amount Rounding Precision") *
@@ -422,7 +428,7 @@ Table 25006619 "Rent Line"
             Caption = 'Inv. Disc. Amount to Invoice';
             Editable = false;
         }
-        field(250; "VAT Identifier"; Code[10])
+        field(250; "VAT Identifier"; Code[20])
         {
             Caption = 'VAT Identifier';
             Editable = false;
@@ -537,12 +543,10 @@ Table 25006619 "Rent Line"
                 //InitOutstandingAmount;
             end;
         }
-        field(300; "VAT Calculation Type"; Option)
+        field(300; "VAT Calculation Type"; Enum "Tax Calculation Type")
         {
             Caption = 'VAT Calculation Type';
             Editable = false;
-            OptionCaption = 'Normal VAT,Reverse Charge VAT,Full VAT,Sales Tax';
-            OptionMembers = "Normal VAT","Reverse Charge VAT","Full VAT","Sales Tax";
         }
         field(310; "VAT %"; Decimal)
         {
@@ -1312,6 +1316,7 @@ Table 25006619 "Rent Line"
 
         RentSalesLine."Start Date" := CalcFromDateLine;
         RentSalesLine."End Date" := CalcFromDateLine + ROUND((RentSalesLine.Quantity * CalculatePeriod(CalcFromDateLine, RentPeriod.Duration, '+')), 1, '=');
+        OnAfterCalculateEndDate(RentSalesLine, Rec, CalcFromDateLine, RentPeriod);
         RentSalesLine."Dimension Set ID" := "Dimension Set ID";
         UpdateRentSalesLineVFRun(RentSalesLine, Rec);
 
@@ -1348,6 +1353,7 @@ Table 25006619 "Rent Line"
             "Qty. to Invoice" := 0;
         "Last Date Invoiced" := RentSalesLine."End Date";
         Modify;
+        OnAfterCreateRentSalesLine(RentSalesLine, Rec);
     end;
 
     procedure CreateSalesLineCancelByDates()
@@ -1530,7 +1536,7 @@ Table 25006619 "Rent Line"
         Validate("Unit Price");
     end;
 
-    local procedure ConvertPriceToVAT(FromPricesInclVAT: Boolean; FromVATProdPostingGr: Code[10]; FromVATBusPostingGr: Code[10]; ToPricesInclVAT: Boolean; ToVATBusPostingGr: Code[10]; ToVATCalcType: Option "Normal VAT","Reverse Charge VAT","Full VAT","Sales Tax"; ToVATPerCent: Decimal; var UnitPrice: Decimal)
+    local procedure ConvertPriceToVAT(FromPricesInclVAT: Boolean; FromVATProdPostingGr: Code[10]; FromVATBusPostingGr: Code[10]; ToPricesInclVAT: Boolean; ToVATBusPostingGr: Code[10]; ToVATCalcType: Enum "Tax Calculation Type"; ToVATPerCent: Decimal; var UnitPrice: Decimal)
     var
         VATPostingSetup: Record "VAT Posting Setup";
         Text010: label 'Prices including VAT cannot be calculated when %1 is %2.';
@@ -1656,10 +1662,15 @@ then
     end;
 
     local procedure UpdateLineDiscount()
+    Var
+        Ishandled: Boolean;
     begin
         GetRentHeader;
-        PriceCalcMgt.FindRentItemDisc(RentHeader, Rec);
-        Validate("Line Discount %");
+        //PriceCalcMgt.FindRentItemDisc(RentHeader, Rec);
+        OnUpdateLineDiscountOnBeforeValidateLineDiscount(rec, Ishandled);
+        if Ishandled then
+            exit;
+        Validate("Line Discount %", PriceCalcMgt.FindRentItemDisc(RentHeader, Rec));
     end;
 
 
@@ -1726,12 +1737,16 @@ then
         ExtraRentPeriod: Record "Rent Period";
         ExtraPeriods: Integer;
         ExtraRun: Decimal;
+        IsHandled: Boolean;
         //RentLinePeriod: Record "Rent Line";
         RentLineVFR: Record "Rent Line";
         VFR1Qty, VFR2Qty, VFR3Qty : Decimal;
         RentAsset: Record "Rent Asset";
         MapViewTelematics: Record "Vehicle Telematics";
     begin
+        OnBeforeCreateExtraChargeLines(rec, IsHandled);
+        if IsHandled then
+            exit;
         CalcFields("Sell-to Customer No.", "Actual Shipment Date", "Actual Return Date", "Quantity Shipped", "Quantity Returned");
         RentHeader.Get("Document Type", "Document No.");
         if RentHeader."Overtime Calculation" = RentHeader."Overtime Calculation"::"Current Period" then
@@ -1779,6 +1794,7 @@ then
                                 ExtraPeriods := ROUND(ExtraDays / DaysInPeriod, 1, '>');
                             if ExtraPeriods > 0 then begin
                                 InsertRentSalesLine(RentSalesLine, RentItem."Extra Charge Resource No.", ExtraRentPeriod."Unit of Measure Code", ExtraPeriods, TempRentItemSalesPrice."Extra Period Price", RentHeader."Location Code");
+                                OnafterinsertExtraDays(RentSalesLine);
                             end;
                         end;
                     end;
@@ -1803,14 +1819,17 @@ then
             ExtraRun := VFR1Qty - RentPeriod."Variable Field Run 1" * "Quantity Invoiced";
             if ExtraRun > 0 then begin
                 InsertRentSalesLine(RentSalesLine, RentItem."Extra Charge Resource No.", RentSetup."Variable Field Run 1", ExtraRun, TempRentItemSalesPrice."Variable Field Run 1", RentHeader."Location Code");
+                OnafterinsertExtraRun(RentSalesLine);
             end;
             ExtraRun := VFR2Qty - RentPeriod."Variable Field Run 2" * "Quantity Invoiced";
             if ExtraRun > 0 then begin
                 InsertRentSalesLine(RentSalesLine, RentItem."Extra Charge Resource No.", RentSetup."Variable Field Run 2", ExtraRun, TempRentItemSalesPrice."Variable Field Run 2", RentHeader."Location Code");
+                OnafterinsertExtraRun(RentSalesLine);
             end;
             ExtraRun := VFR3Qty - RentPeriod."Variable Field Run 3" * "Quantity Invoiced";
             if ExtraRun > 0 then begin
                 InsertRentSalesLine(RentSalesLine, RentItem."Extra Charge Resource No.", RentSetup."Variable Field Run 3", ExtraRun, TempRentItemSalesPrice."Variable Field Run 3", RentHeader."Location Code");
+                OnafterinsertExtraRun(RentSalesLine);
             end;
         end;
         //end;
@@ -1820,6 +1839,7 @@ then
 
     procedure CreateExtraChargeLinesWorksheetTotalPeriod(RentWkshEntryNo: Integer; CalculateOnDate: Date): Integer
     var
+
         ActualDays: Integer;
         OrderDays: Decimal;
         RentPeriod: Record "Rent Period";
@@ -1832,16 +1852,25 @@ then
         RentLinePeriod: Record "Rent Line";
         RentLineVFR: Record "Rent Line";
         VFR1Qty, VFR2Qty, VFR3Qty : Decimal;
+        ErrorNoPeriod: Label 'There is no Rent Period in Rent Order %1, Rent Line %2, Rent Asset No. %3';
+        IsHandled: boolean;
     begin
         CalcFields("Sell-to Customer No.", "Actual Shipment Date", "Actual Return Date", "Quantity Shipped", "Quantity Returned");
         RentHeader.Get("Document Type", "Document No.");
         //if RentHeader."Overtime Calculation" = RentHeader."Overtime Calculation"::"Current Period" then
         //    exit(RentWkshEntryNo);
-        if "Actual Return Date" = 0D then
+        IsHandled := False;
+        //>>DELTA 12/06/2025 NB
+        OnBeforeCheckActualReturnDate(rec, IsHandled);
+        //>>DELTA NB
+        //if ("Actual Return Date" = 0D) then
+        if (Not IsHandled) THEN
             exit(RentWkshEntryNo);
-        if CheckHasExtraChargeLine() then
+        if ("Actual Return Date" = 0D) then
             exit(RentWkshEntryNo);
-
+        if Not IsHandled THEN
+            if CheckHasExtraChargeLine() then
+                exit(RentWkshEntryNo);
         if "Rent Period Type" = '' then
             exit(RentWkshEntryNo);
 
@@ -1855,6 +1884,10 @@ then
         //with RentLinePeriod do begin
         RentSetup.Get;
         RentPeriod.Get("Rent Period Type");
+        if "Rent Period Type" <> '' then
+            RentPeriod.Get("Rent Period Type")
+        else
+            Error(ErrorNoPeriod, Rec."Document No.", Rec."Line No.", Rec."Rent Asset No.");
         RentItem.Get("Rent Item No.");
         RentItem.TestField("Extra Charge Resource No.");
         //CalcFields("Actual Return Date", "Actual Shipment Date");
@@ -1911,8 +1944,9 @@ then
         VFR1Qty += "VF Run 1 To" - "VF Run 1 From";
         VFR2Qty += "VF Run 2 To" - "VF Run 2 From";
         VFR3Qty += "VF Run 3 To" - "VF Run 3 From";
-
+        OnBeforeCalculateExtraRun(Rec, VFR1Qty, VFR2Qty, VFR3Qty, CalculateOnDate, TempRentItemSalesPrice);
         ExtraRun := VFR1Qty - RentPeriod."Variable Field Run 1" * ("Quantity Invoiced" + GetQuantityInvoicedWksht());
+        OnAfterCalculateExtraRun(Rec, VFR1Qty, RentPeriod, ExtraRun, TempRentItemSalesPrice);
         if ExtraRun > 0 then begin
             RentWkshEntryNo := InsertRentWkshtLineTotalPeriod(RentWkshEntryNo, RentItem."Extra Charge Resource No.", RentSetup."Variable Field Run 1", Round(ExtraRun, 1), TempRentItemSalesPrice."Variable Field Run 1", RentHeader."Location Code", CalculateOnDate);
         end;
@@ -1981,7 +2015,7 @@ then
         exit(RentWkshEntryNo);
     end;
 
-    local procedure InsertRentWkshtLineTotalPeriod(RentWkshEntryNo: Integer; ResourceNo: Code[20]; UOMCode: Code[10]; Quantity: Decimal; UnitPrice: Decimal; LocationCode: Code[10]; CalcPeriodEnd: Date): Integer
+    procedure InsertRentWkshtLineTotalPeriod(RentWkshEntryNo: Integer; ResourceNo: Code[20]; UOMCode: Code[10]; Quantity: Decimal; UnitPrice: Decimal; LocationCode: Code[10]; CalcPeriodEnd: Date): Integer
     var
         RentSalesLineNo: Integer;
         RentWkshtLineToInsert: Record "Rent Billing Worksheet Line";
@@ -2013,12 +2047,13 @@ then
         RentWkshtLineToInsert."Extra Charge Line" := true;
         RentWkshtLineToInsert."Period Ending Date" := CalcPeriodEnd;
         RentWkshtLineToInsert."Line Amount" := RentWkshtLineToInsert.Quantity * RentWkshtLineToInsert."Unit Price";
+        OnBeforeInsertWkshtLine(Rec, RentWkshtLineToInsert);
         RentWkshtLineToInsert.Insert(true);
         RentWkshEntryNo += 1;
         exit(RentWkshEntryNo);
     end;
 
-    local procedure InsertRentWkshtLineCurrentPeriod(RentWkshEntryNo: Integer; ResourceNo: Code[20]; UOMCode: Code[10]; Quantity: Decimal; UnitPrice: Decimal; LocationCode: Code[10]; CalcPeriodEnd: Date; RentWkshtLine: Record "Rent Billing Worksheet Line"): Integer
+    procedure InsertRentWkshtLineCurrentPeriod(RentWkshEntryNo: Integer; ResourceNo: Code[20]; UOMCode: Code[10]; Quantity: Decimal; UnitPrice: Decimal; LocationCode: Code[10]; CalcPeriodEnd: Date; RentWkshtLine: Record "Rent Billing Worksheet Line"): Integer
     var
         RentSalesLineNo: Integer;
         RentWkshtLineToInsert: Record "Rent Billing Worksheet Line";
@@ -2148,7 +2183,7 @@ then
         DimMgt.GetShortcutDimensions("Dimension Set ID", ShortcutDimCode);
     end;
 
-    local procedure CheckHasExtraChargeLine(): Boolean
+    procedure CheckHasExtraChargeLine(): Boolean
     var
         RentSalesLineExtra: Record "Rent Sales Line";
     begin
@@ -2234,20 +2269,36 @@ then
 
     procedure CalculatePeriod(DateTo: Date; DurationFormula: DateFormula; Direction: Code[1]): integer
     var
+        CalculatedDate: Date;
     begin
         RentSetup.Get();
         if Direction = '+' then
             if RentSetup."Rent Period Calc. Type" = RentSetup."Rent Period Calc. Type"::"Standard Period" then
                 exit(CalcDate('<-1D>', CalcDate(StrSubstNo('+%1', DurationFormula), CALCDATE('<+1D>', DateTo))) - DateTo)
-            else
+            else Begin
                 //exit(CalcDate(StrSubstNo('+%1', DurationFormula), DateTo) - DateTo)
-                exit(CalcDate(StrSubstNo('<+1D+%1-1D>', DurationFormula), DateTo) - DateTo)
+                //>>DELTA XX
+                //exit(CalcDate(StrSubstNo('<+1D+%1-1D>', DurationFormula), DateTo) - DateTo)
+                CalculatedDate := Calcdate('<+1D>', DateTo);
+                CalculatedDate := Calcdate(StrSubstNo('+%1', DurationFormula), CalculatedDate);
+                CalculatedDate := Calcdate('<-1D>', CalculatedDate);
+                exit(CalculatedDate - DateTo);
+                //<<DELTA XX
+            End
         else
             if RentSetup."Rent Period Calc. Type" = RentSetup."Rent Period Calc. Type"::"Standard Period" then
                 exit(DateTo - CalcDate('<-1D>', CalcDate(StrSubstNo('-%1', DurationFormula), CALCDATE('<+1D>', DateTo))))
-            else
+            else Begin
                 //exit(DateTo - CalcDate(StrSubstNo('-%1', DurationFormula), DateTo));
-                exit(DateTo - CalcDate(StrSubstNo('<+1D-%1-1D>', DurationFormula), DateTo));
+                //>>DELTA XX
+                //exit(DateTo - CalcDate(StrSubstNo('<+1D-%1-1D>', DurationFormula), DateTo));
+                CalculatedDate := Calcdate('<+1D>', DateTo);
+                CalculatedDate := Calcdate(StrSubstNo('-%1', DurationFormula), CalculatedDate);
+                CalculatedDate := Calcdate('<-1D>', CalculatedDate);
+                exit(DateTo - CalculatedDate);
+                //DELTA XX
+            End;
+
     end;
 
     procedure CreateSpecialChargeSalesLine(var RentWkshtLine: Record "Rent Billing Worksheet Line")
@@ -2313,6 +2364,7 @@ then
     var
         WkshtInvQty: Decimal;
         RentBillWkshLine: Record "Rent Billing Worksheet Line";
+        IsHandled: Boolean;
     begin
         RentBillWkshLine.Reset;
         RentBillWkshLine.SetRange("Document Type", "Document Type");
@@ -2326,6 +2378,68 @@ then
 
         exit(WkshtInvQty);
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckActualReturnDate(RentLine: Record "Rent Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCalculateExtraRun(RentLine: Record "Rent Line"; var VFR1Qty: Decimal; var VFR2Qty: Decimal; var VFR3Qty: Decimal; Var CalculateOnDate: Date; var TempRentItemSalesPrice: Record "Rent Item Sales Price" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCalculateExtraRun(RentLine: Record "Rent Line"; var VFR1Qty: Decimal; var RentPeriod: Record "Rent Period"; Var ExtraRun: Decimal; var TempRentItemSalesPrice: Record "Rent Item Sales Price" temporary)
+    begin
+    end;
+
+    [integrationEvent(false, false)]
+    local procedure OnBeforeInsertWkshtLine(RentLine: record "Rent Line"; Var RentWkshtLineToInsert: Record "Rent Billing Worksheet Line")
+    begin
+
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCreateRentSalesLine(RentSalesLine: Record "Rent Sales Line"; Rec: Record "Rent Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnafterinsertExtraDays(var RentSalesLine: Record "Rent Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnafterinsertExtraRun(var RentSalesLine: Record "Rent Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateLineDiscountOnBeforeValidateLineDiscount(rec: Record "Rent Line"; var Ishandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateExtraChargeLines(RentLine: Record "Rent Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCalculateEndDate(var RentSalesLine: Record "Rent Sales Line"; Rec: Record "Rent Line"; CalcFromDateLine: Date; RentPeriod: Record "Rent Period")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateLineDiscountPercentOnBeforeLineDiscountAmount(Rec: Record "Rent Line"; xRec: Record "Rent Line"; CurrFieldNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetRentAssetNo(rec: Record "Rent Line"; var IsHandled: Boolean)
+    begin
+    end;
+
 
 }
 

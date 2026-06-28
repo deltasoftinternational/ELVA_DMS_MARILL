@@ -74,7 +74,10 @@ Codeunit 25006124 "Serv-Quote to Order EDMS"
         ServiceOrderHeader."Location Code" := rec."Location Code";
 
         ServiceOrderHeader."Prepayment %" := Cust."Prepayment %";
-
+        ServiceOrderHeader."Service Advisor" := rec."Service Advisor";
+        //>>DELTA
+        OnBeforeModifyServiceOrderHeader(ServiceOrderHeader, rec);
+        //<<DELTA
         ServiceOrderHeader.Modify;
 
         ModifyScheduleEntries(Rec, ServiceOrderHeader);
@@ -519,6 +522,11 @@ Codeunit 25006124 "Serv-Quote to Order EDMS"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertServiceOrderHeader(var SalesOrderHeader: Record "Service Header EDMS"; var ServiceQuoteHeader: Record "Service Header EDMS")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeModifyServiceOrderHeader(var SalesOrderHeader: Record "Service Header EDMS"; var ServiceQuoteHeader: Record "Service Header EDMS")
     begin
     end;
 

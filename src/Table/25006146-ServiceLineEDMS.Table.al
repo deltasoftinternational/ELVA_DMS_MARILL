@@ -946,12 +946,10 @@ Table 25006146 "Service Line EDMS"
                 TestStatusOpen;                                                                  // 14.04.2014 Elva Baltic P21
             end;
         }
-        field(77; "VAT Calculation Type"; Option)
+        field(77; "VAT Calculation Type"; Enum "Tax Calculation Type")
         {
             Caption = 'VAT Calculation Type';
             Editable = false;
-            OptionCaption = 'Normal VAT,Reverse Charge VAT,Full VAT,Sales Tax';
-            OptionMembers = "Normal VAT","Reverse Charge VAT","Full VAT","Sales Tax";
         }
         field(80; "Attached to Line No."; Integer)
         {
@@ -1059,11 +1057,9 @@ Table 25006146 "Service Line EDMS"
             Editable = false;
             FieldClass = FlowField;
         }
-        field(96; Reserve; Option)
+        field(96; Reserve; Enum "Reserve Method")
         {
             Caption = 'Reserve';
-            OptionCaption = 'Never,Optional,Always';
-            OptionMembers = Never,Optional,Always;
 
             trigger OnValidate()
             begin
@@ -1136,7 +1132,7 @@ Table 25006146 "Service Line EDMS"
             Caption = 'Inv. Disc. Amount to Invoice';
             Editable = false;
         }
-        field(106; "VAT Identifier"; Code[10])
+        field(106; "VAT Identifier"; Code[20])
         {
             Caption = 'VAT Identifier';
             Editable = false;
@@ -1250,12 +1246,10 @@ Table 25006146 "Service Line EDMS"
             Editable = false;
             MinValue = 0;
         }
-        field(116; "Prepmt. VAT Calc. Type"; Option)
+        field(116; "Prepmt. VAT Calc. Type"; Enum "Tax Calculation Type")
         {
             Caption = 'Prepmt. VAT Calc. Type';
             Editable = false;
-            OptionCaption = 'Normal VAT,Reverse Charge VAT,Full VAT,Sales Tax';
-            OptionMembers = "Normal VAT","Reverse Charge VAT","Full VAT","Sales Tax";
         }
         field(117; "Prepayment VAT Identifier"; Code[10])
         {
@@ -1724,6 +1718,10 @@ Table 25006146 "Service Line EDMS"
             DecimalPlaces = 0 : 5;
             Editable = false;
         }
+        field(7000; "Price Calculation Method"; Enum "Price Calculation Method")
+        {
+            Caption = 'Price Calculation Method';
+        }
         field(7001; "Allow Line Disc."; Boolean)
         {
             Caption = 'Allow Line Disc.';
@@ -1776,7 +1774,7 @@ Table 25006146 "Service Line EDMS"
                 CalcFields("Group Description");
             end;
         }
-        field(60120; "Group Description"; Text[50])
+        field(60120; "Group Description"; Text[100])
         {
             CalcFormula = lookup("Service Line EDMS".Description where("Document Type" = field("Document Type"),
                                                                         "Document No." = field("Document No."),
@@ -2496,7 +2494,6 @@ Table 25006146 "Service Line EDMS"
         Text044: label 'cannot be less than %1';
         Text045: label 'cannot be more than %1';
         Text047: label 'must be positive when %1 is not 0';
-        HideValidationDialog: Boolean;
         ServiceHeader: Record "Service Header EDMS";
         Text048: label 'Cannnot put-in/take-out item with sie assignments. Use SIE assignments.';
         Text120: label 'Can not transfer if invoice exists!';
@@ -2549,6 +2546,9 @@ Table 25006146 "Service Line EDMS"
         Text128: label 'Value can''t be changed if exist Transfer Order No.%1!';
         Text129: label 'Item is under stocktaking';
 
+    protected var
+        HideValidationDialog: Boolean;
+
     local procedure GetItem()
     begin
         TestField("No.");
@@ -2586,6 +2586,7 @@ Table 25006146 "Service Line EDMS"
         if not "System-Created Entry" then
             if Type <> Type::Comment then
                 ServiceHeader.TestField(Status, ServiceHeader.Status::Open);
+        OnAfterTestStatusOpen(Rec, ServiceHeader);
     end;
 
 
@@ -3018,6 +3019,10 @@ Table 25006146 "Service Line EDMS"
         Recreate := NewRecreate
     end;
 
+    procedure GetRecreate(): Boolean
+    begin
+        exit(Recreate);
+    end;
 
     procedure GetDescrLang()
     var
@@ -3277,10 +3282,14 @@ Table 25006146 "Service Line EDMS"
         ReservationEntry: Record "Reservation Entry";
         ReservationEntry2: Record "Reservation Entry";
         ItemCost2: Decimal;
+        handled: Boolean;
     begin
         //ActioType = 0 => Value validation
         //ActioType = 1 => Document Release
 
+        onBeforeApplyMarkupRestrictions(ActionType, handled);
+        if handled then
+            exit;
         if (Type <> Type::Item) or ("Quantity (Base)" = 0) then
             exit;
 
@@ -3296,12 +3305,20 @@ Table 25006146 "Service Line EDMS"
         end else
             exit;
 
-        ItemMarkupRestriction.Reset;
-        ItemMarkupRestriction.SetFilter("Group Code", '%1|''''', UserSetup."Item Markup Restriction Group");
-        ItemMarkupRestriction.SetFilter("Customer Price Group", '%1|''''', "Customer Price Group");
-        ItemMarkupRestriction.SetFilter("Item Category Code", '%1|''''', "Item Category Code");
-        if not ItemMarkupRestriction.FindFirst then
+        if not ItemMarkupRestrictionGroup.get(UserSetup."Item Markup Restriction Group") Then
             exit;
+
+        onBeforefilterItemMarkupRestriction(ItemMarkupRestriction, rec, UserSetup."Item Markup Restriction Group", handled);
+
+
+        if not handled then begin
+            ItemMarkupRestriction.Reset;
+            ItemMarkupRestriction.SetFilter("Group Code", '%1|''''', UserSetup."Item Markup Restriction Group");
+            ItemMarkupRestriction.SetFilter("Customer Price Group", '%1|''''', "Customer Price Group");
+            ItemMarkupRestriction.SetFilter("Item Category Code", '%1|''''', "Item Category Code");
+            if not ItemMarkupRestriction.FindFirst then
+                exit;
+        end;
 
         //22.10.2007. EDMS P2 >>
         ItemMarkupRestrictionGroup.Get(ItemMarkupRestriction."Group Code");
@@ -3348,7 +3365,10 @@ Table 25006146 "Service Line EDMS"
             0: //validation
                 begin
                     if LineMarkupPercent < ItemMarkupRestriction."Min. Markup %" then
-                        Message(TextMarkupRestriced, "No.", ItemMarkupRestriction."Min. Markup %", TextPercent);
+                        if ItemMarkupRestrictionGroup."Notification Type" = ItemMarkupRestrictionGroup."notification type"::Error then
+                            Error(TextMarkupRestriced, "No.", ItemMarkupRestriction."Min. Markup %", TextPercent)
+                        else
+                            Message(TextMarkupRestriced, "No.", ItemMarkupRestriction."Min. Markup %", TextPercent);
                 end;
             1: //release
                 begin
@@ -3479,8 +3499,10 @@ Table 25006146 "Service Line EDMS"
         ServicePackage: Record "Service Package";
         ConfirmText: Text[250];
     begin
+        OnBeforeCheckPackage(rec, RunMode);
         //RunMode = 0, evaluated at line modify, 1 - deletion of line process;
         ServiceSetup.Get;
+
         if not ServiceSetup."Control Package Consistency" then
             exit;
 
@@ -4803,10 +4825,15 @@ Table 25006146 "Service Line EDMS"
     procedure GetReservationColor(): Text[20]
     var
         ResEntry: Record "Reservation Entry";
+        CheckItem: Record Item;
     begin
         // 19.03.2014 Elva Baltic P21 >>
         if (Type <> Type::Item) or ("No." = '') then
             exit('None');
+
+        if CheckItem.Get(Rec."No.") then
+            if CheckItem.Type <> CheckItem.Type::Inventory then
+                exit('None');
 
         if CalcTransferedQuantity = Quantity then
             exit('None');
@@ -5107,7 +5134,7 @@ Table 25006146 "Service Line EDMS"
                 end;
             end;
         end;
-        Commit;
+        //Commit;
 
 
 
@@ -5428,6 +5455,76 @@ Table 25006146 "Service Line EDMS"
         Error('');
     end;
 
+    var
+        SelectItemErr: Label 'You must select an existing item.';
+        ServiceHeaderEDMS: Record "Service Header EDMS";
+        PriceType: Enum "Price Type";
+
+    procedure PickDiscount()
+    var
+        PriceCalculation: Interface "Price Calculation";
+    begin
+        GetPriceCalculationHandler(PriceType::Sale, ServiceHeaderEDMS, PriceCalculation);
+        PriceCalculation.PickDiscount();
+        GetLineWithCalculatedPrice(PriceCalculation);
+
+        OnAfterPickDiscount(Rec, PriceCalculation);
+    end;
+
+    procedure PickPrice()
+    var
+        PriceCalculation: Interface "Price Calculation";
+    begin
+        GetPriceCalculationHandler(PriceType::Sale, ServiceHeaderEDMS, PriceCalculation);
+        PriceCalculation.PickPrice();
+        GetLineWithCalculatedPrice(PriceCalculation);
+
+        OnAfterPickPrice(Rec, PriceCalculation);
+    end;
+
+    procedure GetPriceCalculationHandler(PriceType: Enum "Price Type"; ServiceHeaderEDMS: Record "Service Header EDMS"; var PriceCalculation: Interface "Price Calculation")
+    var
+        PriceCalculationMgt: codeunit "Price Calculation Mgt.";
+        LineWithPrice: Interface "Line With Price";
+    begin
+        if (ServiceHeaderEDMS."No." = '') and ("Document No." <> '') then
+            ServiceHeaderEDMS.Get(Rec."Document Type", Rec."Document No.");
+        GetLineWithPrice(LineWithPrice);
+        LineWithPrice.SetLine(PriceType, ServiceHeaderEDMS, Rec);
+        PriceCalculationMgt.GetHandler(LineWithPrice, PriceCalculation);
+    end;
+
+    local procedure GetLineWithCalculatedPrice(var PriceCalculation: Interface "Price Calculation")
+    var
+        Line: Variant;
+    begin
+        PriceCalculation.GetLine(Line);
+        Rec := Line;
+    end;
+
+    procedure GetLineWithPrice(var LineWithPrice: Interface "Line With Price")
+    var
+        SalesLinePrice: Codeunit "Service Line EDMS - Price";
+    begin
+        LineWithPrice := SalesLinePrice;
+        OnAfterGetLineWithPrice(LineWithPrice);
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnAfterGetLineWithPrice(var LineWithPrice: Interface "Line With Price")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterPickPrice(var ServiceLineEDMS: Record "Service Line EDMS"; var PriceCalculation: Interface "Price Calculation")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterPickDiscount(var ServiceLineEDMS: Record "Service Line EDMS"; var PriceCalculation: Interface "Price Calculation")
+    begin
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnbeforefilterCheckDiscount("servicelinesEDMS": record "service line EDMS"; var SalesDiscount: Record "SP Sales Disc. Group Items"; var IsHandled: Boolean)
     begin
@@ -5443,7 +5540,26 @@ Table 25006146 "Service Line EDMS"
     begin
     end;
 
-    var
-        SelectItemErr: Label 'You must select an existing item.';
-}
+    [IntegrationEvent(false, false)]
+    local procedure onBeforefilterItemMarkupRestriction(var ItemMarkupRestriction: Record "Item Markup Restriction"; Rec: record "service line EDMS"; "Item Markup Restriction Group": code[20]; var ishandled: Boolean)
+    begin
+    end;
 
+    [IntegrationEvent(false, false)]
+    local procedure onBeforeApplyMarkupRestrictions(var actiontype: Integer; var handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckPackage(rec: Record "Service Line EDMS"; RunMode: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterTestStatusOpen(var ServiceLineEDMS: Record "Service Line EDMS"; var ServiceHeaderEDMS: Record "Service Header EDMS")
+    begin
+    end;
+
+
+
+}

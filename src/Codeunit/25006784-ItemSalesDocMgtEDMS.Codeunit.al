@@ -1229,12 +1229,16 @@ Codeunit 25006784 "Item Sales Doc. Mgt. EDMS"
         ApplicationEventMgt: Codeunit "Application Event Management";
         TransHeader: Record "Transfer Header";
         Location: Record Location;
+        IsHandled: Boolean;
     begin
         If TransHeader.get(TransLine."Document No.") then begin
             GetLocation(TransHeader."Transfer-from Code");
             // 28.03.2014 Elva Baltic P21 >>
-            if (TransLine."Qty. to Ship" <> 0) then
-                ApplicationEventMgt.EDMSCheckItemInInventory(TransLine);
+            if (TransLine."Qty. to Ship" <> 0) then begin
+                OnBeforeEDMSCheckItemInInventory(TransLine, IsHandled);
+                if not IsHandled then
+                    ApplicationEventMgt.EDMSCheckItemInInventory(TransLine);
+            end;
             if (Location."Bin Mandatory") and (TransLine."Qty. to Ship" <> 0) then
                 TransLine.TestField(TransLine."Transfer-from Bin Code");
             // 28.03.2014 Elva Baltic P21 <<
@@ -1329,6 +1333,7 @@ Codeunit 25006784 "Item Sales Doc. Mgt. EDMS"
 
         DefaultNumberEDMS: Option " ","Shipment&Receipt",Shipment,Receipt;
         lIsHandled: boolean;
+        HandledMenu: Boolean;
     begin
         If TransHeader."Document Profile" <> TransHeader."Document Profile"::Service then
             exit;
@@ -1340,6 +1345,9 @@ Codeunit 25006784 "Item Sales Doc. Mgt. EDMS"
             DefaultNumberEDMS := Defaultnumberedms::Receipt
         else
             DefaultNumberEDMS := Defaultnumberedms::"Shipment&Receipt";
+        OnBeforeShowMenuTransfer(TransHeader, DefaultNumberEDMS, HandledMenu, Selection);
+        if HandledMenu then
+            exit;
         OnBeforeShowShipmentReceiptDialog(TransHeader, DefaultNumberEDMS, lIsHandled);
         if not lIsHandled then
             Selection := StrMenu(Text101, DefaultNumberEDMS);
@@ -1950,5 +1958,14 @@ Codeunit 25006784 "Item Sales Doc. Mgt. EDMS"
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeEDMSCheckItemInInventory(TransLine: Record "Transfer Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeShowMenuTransfer(var TransHeader: Record "Transfer Header"; var DefaultNumberEDMS: Option; VAR showmennu: Boolean; var Selection: Option)
+    begin
+    end;
 }
 

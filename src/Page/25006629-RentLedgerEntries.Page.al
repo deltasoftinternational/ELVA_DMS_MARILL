@@ -36,7 +36,6 @@ Page 25006629 "Rent Ledger Entries"
                 field(UnitofMeasureCode; Rec."Unit of Measure Code")
                 {
                     ApplicationArea = Basic;
-                    Visible = false;
                 }
                 field(Quantity; Rec.Quantity)
                 {
@@ -243,6 +242,10 @@ Page 25006629 "Rent Ledger Entries"
                     ApplicationArea = Basic;
                 }
                 field(VehicleSerialNo; Rec."Vehicle Serial No.")
+                {
+                    ApplicationArea = Basic;
+                }
+                field(VIN; Rec.VIN)
                 {
                     ApplicationArea = Basic;
                 }

@@ -1,4 +1,4 @@
-report 25006114 "Rent Create Invoices"
+report 25006000 "Rent Create Invoices"
 {
     Caption = 'Rent Create Invoices';
     ProcessingOnly = true;
@@ -7,6 +7,14 @@ report 25006114 "Rent Create Invoices"
     {
         dataitem(RentBillingWkshtLines; "Rent Billing Worksheet Line")
         {
+
+            trigger OnPreDataItem()
+            begin
+                //>>DELTA XX
+                OnApplyingFilterOnPreDataItem(RentBillingWkshtLines);
+                //DELTA XX
+            end;
+
             trigger OnAfterGetRecord()
             begin
 
@@ -144,7 +152,11 @@ report 25006114 "Rent Create Invoices"
                                 else
                                     RentLine."Qty. to Invoice" := 0;
 
-                                RentLine."Last Date Invoiced" := RentSalesLine."End Date";
+                                //>>DELTA XX
+                                OnBeforeUpdateLastInvoiceDateForSingleInvoices(ishandled);
+                                if isHandled = false then
+                                    //<<DELTA XX
+                                    RentLine."Last Date Invoiced" := RentSalesLine."End Date";
                                 RentLine.Modify;
                             end;
                         end;
@@ -176,6 +188,9 @@ report 25006114 "Rent Create Invoices"
         //Delete processed worksheet lines
         RentWkshtLines.Reset();
         //RentWkshtLines.SetRange("To Invoice", true);
+        //>>DELTA XX
+        OnApplyingFilterOnPreDataItem(RentWkshtLines);
+        //DELTA XX
         RentWkshtLines.SetRange("Process Line", true);
         if RentWkshtLines.FindFirst() then
             repeat
@@ -193,7 +208,6 @@ report 25006114 "Rent Create Invoices"
 
     var
         CompanyInfo: Record "Company Information";
-        NoSeriesMgt: Codeunit "No. Series";
         DateEmptyErr: label 'Invoice date is empty.';
         NoSerieEmptyErr: label 'No. serie is empty.';
         DueDateBeforeInvDateErr: label 'Invoice date %1 is after Due Date %2';
@@ -215,9 +229,25 @@ report 25006114 "Rent Create Invoices"
         InvoiceNoFirst: Code[20];
         InvoiceNoLast: Code[20];
         InvoiceDate: Date;
+        isHandled: Boolean;
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertRensSalesLine(var RentSalesLine: Record "Rent Sales Line"; RentBillWkshLine: Record "Rent Billing Worksheet Line")
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateLastInvoiceDateForSingleInvoices(var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnApplyingFilterOnPreDataItem(Var RentWorkSheetHeader: Record "Rent Billing Worksheet Line")
+    begin
+
+    end;
+
+
+
 }
+

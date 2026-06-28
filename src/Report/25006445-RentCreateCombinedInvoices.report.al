@@ -1,4 +1,4 @@
-report 25006115 "Rent Create Combined Invoices"
+report 25006029 "Rent Create Combined Invoices"
 {
     Caption = 'Rent Create Combined Invoices';
     ProcessingOnly = true;
@@ -7,6 +7,14 @@ report 25006115 "Rent Create Combined Invoices"
     {
         dataitem(RentBillingWkshtLines; "Rent Billing Worksheet Line")
         {
+            trigger OnPreDataItem()
+            begin
+                //>>DELTA XX
+                OnApplyingFilterOnPreDataItem(RentBillingWkshtLines);
+                //DELTA XX
+            end;
+
+
             trigger OnAfterGetRecord()
             begin
 
@@ -143,11 +151,15 @@ report 25006115 "Rent Create Combined Invoices"
                                     RentLine."Qty. to Invoice" := RentLine.Quantity - RentLine."Quantity Invoiced"
                                 else
                                     RentLine."Qty. to Invoice" := 0;
-
-                                RentLine."Last Date Invoiced" := RentSalesLine."End Date";
+                                //>>DELTA XX
+                                OnBeforeUpdateLastInvoiceDateForCombinedInvoices(IsHandled);
+                                if IsHandled = false then
+                                    //<<DELTA XX
+                                    RentLine."Last Date Invoiced" := RentSalesLine."End Date";
                                 RentLine.Modify;
                             end;
                         end;
+                        OnAfterModifyRentLine(RentWkshtLines, RentLine);
                     /*
                     if RentLine.Get(RentWkshtLines."Document Type", RentWkshtLines."Document No.", RentWkshtLines."Line No.") then begin
                         if RentWkshtLines."Extra Charge Line" = true then
@@ -168,6 +180,9 @@ report 25006115 "Rent Create Combined Invoices"
 
         //Call create rent invoice
         RentWkshtLines.Reset();
+        //>>DELTA XX
+        OnApplyingFilterOnPreDataItem(RentWkshtLines);
+        //<<DELTA XX
         RentPost.GroupRentOrderMerchants(RentWkshtLines, RentMerchantsCombined);
         RentMerchantsCombined.Reset();
         If RentMerchantsCombined.FindFirst() then
@@ -175,6 +190,9 @@ report 25006115 "Rent Create Combined Invoices"
 
                 RentWkshtLines.Reset();
                 RentWkshtLines.SetRange("Process Line", true);
+                //>>DELTA XX
+                OnApplyingFilterOnPreDataItem(RentWkshtLines);
+                //<<DELTA XX
                 RentWkshtLines.SetRange("To Invoice", true);
                 RentWkshtLines.SetRange("Sell-to Customer No.", RentMerchantsCombined."Sell-to Customer No.");
                 RentWkshtLines.SetRange("Bill-to Customer No.", RentMerchantsCombined."Bill-to Customer No.");
@@ -198,6 +216,9 @@ report 25006115 "Rent Create Combined Invoices"
         RentWkshtLines.Reset();
         RentWkshtLines.SetRange("Process Line", true);
         //RentWkshtLines.SetRange("To Invoice", true);
+        //>>DELTA XX
+        OnApplyingFilterOnPreDataItem(RentWkshtLines);
+        //DELTA XX
         if RentWkshtLines.FindFirst() then
             repeat
                 RentWkshtLines.Delete();
@@ -212,8 +233,8 @@ report 25006115 "Rent Create Combined Invoices"
     end;
 
     var
+        ishandled: Boolean;
         CompanyInfo: Record "Company Information";
-        NoSeriesMgt: Codeunit "No. Series";
         DateEmptyErr: label 'Invoice date is empty.';
         NoSerieEmptyErr: label 'No. serie is empty.';
         DueDateBeforeInvDateErr: label 'Invoice date %1 is after Due Date %2';
@@ -239,5 +260,22 @@ report 25006115 "Rent Create Combined Invoices"
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertRensSalesLine(var RentSalesLine: Record "Rent Sales Line"; RentBillWkshLine: Record "Rent Billing Worksheet Line")
     begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterModifyRentLine(Var RentBillWkshLine: Record "Rent Billing Worksheet Line"; Var RentLine: Record "Rent Line")
+    begin
+
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateLastInvoiceDateForCombinedInvoices(var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnApplyingFilterOnPreDataItem(Var RentWorkSheetHeader: Record "Rent Billing Worksheet Line")
+    begin
+
     end;
 }

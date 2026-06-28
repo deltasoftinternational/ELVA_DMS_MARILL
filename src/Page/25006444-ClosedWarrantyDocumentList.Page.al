@@ -1,21 +1,15 @@
-Page 25006406 "Warranty Document List"
+page 25006447 "Closed Warranty Document List"
 {
-    // 06.10.2017 EB.AKR Warranty
-    //   Added fields:
-    //     51200 Total Amount
-    //     51201 Total Adjusted
-    //     51202 Total Approved
-    //     51203 Total Rejected
-    //     51240 Initial Service Order No.
-    //     52110 Recall Campaign External No.
-
-    ApplicationArea = Basic;
-    Caption = 'Warranty Document List';
-    CardPageID = "Warranty Document Card";
-    Editable = false;
+    ApplicationArea = All;
+    Caption = 'Closed Warranty Document List';
+    CardPageID = "Closed Warranty Document";
     PageType = List;
+    DeleteAllowed = false;
+    Editable = false;
+    InsertAllowed = false;
+    ModifyAllowed = false;
     SourceTable = "Warranty Document Header";
-    SourceTableView = where(Closed = const(false));
+    SourceTableView = where(Closed = const(true));
     UsageCategory = Lists;
 
     layout
@@ -92,17 +86,14 @@ Page 25006406 "Warranty Document List"
                 field(VariableFieldRun1; Rec."Variable Field Run 1")
                 {
                     ApplicationArea = Basic;
-                    Visible = VFRun1Visible;
                 }
                 field(VariableFieldRun2; Rec."Variable Field Run 2")
                 {
                     ApplicationArea = Basic;
-                    Visible = VFRun2Visible;
                 }
                 field(VariableFieldRun3; Rec."Variable Field Run 3")
                 {
                     ApplicationArea = Basic;
-                    Visible = VFRun3Visible;
                 }
                 field(ClaimJobType; Rec."Claim Job Type")
                 {
@@ -177,22 +168,4 @@ Page 25006406 "Warranty Document List"
             }
         }
     }
-
-    trigger OnInit()
-    begin
-        SetVariableFields;
-    end;
-
-    var
-        VFRun1Visible: Boolean;
-        VFRun2Visible: Boolean;
-        VFRun3Visible: Boolean;
-
-    procedure SetVariableFields()
-    begin
-        VFRun1Visible := rec.IsVFActive(rec.FieldNo("Variable Field Run 1"));
-        VFRun2Visible := rec.IsVFActive(rec.FieldNo("Variable Field Run 2"));
-        VFRun3Visible := rec.IsVFActive(rec.FieldNo("Variable Field Run 3"));
-    end;
 }
-

@@ -80,6 +80,7 @@ Codeunit 25006615 "Rent Event Management"
             if RentAsset."Asset Type" <> RentAsset."Asset Type"::Multiple then begin
                 RentLineCheck.Reset();
                 RentLineCheck.SetRange("Rent Asset No.", Rec."Rent Asset No.");
+                OnBeforeRentLineCheckAddFilter(RentLineCheck, Rec);
                 if not RentLineCheck.FindSet() then begin
                     RentAsset.Status := RentAsset.Status::Available;
                     RentAsset.Modify;
@@ -148,6 +149,10 @@ Codeunit 25006615 "Rent Event Management"
         end;
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeRentLineCheckAddFilter(var RentLineCheck: Record "Rent Line"; var Rec: Record "Rent Line")
+    begin
+    end;
     /*
         [EventSubscriber(ObjectType::Codeunit, Codeunit::"Rent Jnl.-Post Line", 'OnAfterPostRentJnlLine', '', true, true)]
         local procedure AfterOnPostRentJnlLine(var RentJnlLine: Record "Rent Journal Line")

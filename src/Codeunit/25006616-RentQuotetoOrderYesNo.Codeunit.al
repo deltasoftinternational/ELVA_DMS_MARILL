@@ -8,6 +8,8 @@ Codeunit 25006616 "Rent-Quote to Order (Yes/No)"
         OpenPage: Boolean;
         RentOrder: Page "Rent Order";
     begin
+        if IsOnRunHandled(Rec) then
+            exit;
         Rec.TestField("Document Type", Rec."document type"::Quote);
         if GuiAllowed then
             if not Confirm(Text000, false) then
@@ -36,6 +38,13 @@ Codeunit 25006616 "Rent-Quote to Order (Yes/No)"
         end;
     end;
 
+    local procedure IsOnRunHandled(var RentHeader: Record "Rent Header") IsHandled: Boolean
+    begin
+        IsHandled := false;
+        OnBeforeRun(RentHeader, IsHandled);
+        exit(IsHandled);
+    end;
+
     var
         Text000: label 'Do you want to convert the quote to an order?';
         Text001: label 'Quote %1 has been changed to order %2.';
@@ -44,5 +53,10 @@ Codeunit 25006616 "Rent-Quote to Order (Yes/No)"
         Text002: label 'This quote has not been accepted by the customer.\\Do you still want to convert it to an order?';
         Text003: label 'This quote has been rejected by the customer.\\Do you still want to convert it to an order?';
         OpenNewInvoiceQst: label 'The quote has been converted to order %1. Do you want to open the new order?', Comment = '%1 = No. of the new sales order document.';
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeRun(var RentHeader: Record "Rent Header"; var IsHandled: Boolean)
+    begin
+    end;
 }
 

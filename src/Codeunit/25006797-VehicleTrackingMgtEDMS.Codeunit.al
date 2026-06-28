@@ -752,7 +752,9 @@ Codeunit 25006797 "Vehicle Tracking Mgt. EDMS"
             //      END;
             RentJnlLine."Currency Code" := TempSalesLineForRentPosting."Currency Code";
             RentJnlLine."Discount %" := TempSalesLineForRentPosting."Line Discount %";
+            OnBeforeRentJnlLineRunWithCheck(RentJnlLine, SalesHeader, SalesLine);
             RentJnlPostLine.RunWithCheck(RentJnlLine);
+            OnAfterRentJnlLineRunWithCheck(RentJnlLine, SalesHeader, SalesLine);
         end;
         //EB.P30 RENT <<
 
@@ -1259,6 +1261,7 @@ Codeunit 25006797 "Vehicle Tracking Mgt. EDMS"
                 if SalesHeader."Post Purchasing Invoice" then begin
                     Codeunit.Run(Codeunit::"Release Purchase Document", PurchInvcHeader);
                     PurchPost.Run(PurchInvcHeader);
+                    OnAfterPostLinkedPurchaseInvoice(SalesHeader, PurchInvcHeader, SalesCrMemoHeader);
                 end else
                     Message(Text101)
             end;
@@ -1783,7 +1786,20 @@ Codeunit 25006797 "Vehicle Tracking Mgt. EDMS"
     end;
 
 
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterPostLinkedPurchaseInvoice(var SalesHeader: Record "Sales Header"; PurchInvcHeader: Record "Purchase Header"; var SalesCrMemoHeader: Record "Sales Cr.Memo Header")
+    begin
+    end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeRentJnlLineRunWithCheck(var RentJnlLine: Record "Rent Journal Line"; var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterRentJnlLineRunWithCheck(var RentJnlLine: Record "Rent Journal Line"; var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line")
+    begin
+    end;
 
 
 

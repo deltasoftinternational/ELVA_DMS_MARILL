@@ -358,6 +358,11 @@ Table 25006406 "Warranty Document Line"
                 TestStatusOpen;                                                             // 14.04.2014 Elva Baltic P21
             end;
         }
+        field(5000; Closed; Boolean)
+        {
+            Caption = 'Closed';
+            DataClassification = ToBeClassified;
+        }
         field(51200; "Labor Type"; Option)
         {
             Caption = 'Labor Type';

@@ -24,6 +24,7 @@ Codeunit 25006293 "Purchase Post Event Management"
         ColorCode: Code[20];
         InteriorCode: Code[20];
         VehoptMgt: Codeunit VehicleOptionManagement;
+        IsHandled: Boolean;
     begin
         PurchLine.Reset;
         PurchLine.SetRange("Document Type", PurchaseHeader."Document Type");
@@ -53,11 +54,12 @@ Codeunit 25006293 "Purchase Post Event Management"
                                     Vehicle."Body Color Code" := ColorCode;
                                     Vehicle.Modify
                                 end;
-
-                                if PurchLine."Vehicle Status Code" <> Vehicle."Status Code" then begin
-                                    Vehicle."Status Code" := PurchLine."Vehicle Status Code";
-                                    Vehicle.Modify
-                                end;
+                                OnBeforePostCommitPurchaseDocOnBeforeUpdateVehicleStatus(PurchLine, Vehicle, IsHandled);
+                                if not IsHandled then
+                                    if PurchLine."Vehicle Status Code" <> Vehicle."Status Code" then begin
+                                        Vehicle.Validate("Status Code", PurchLine."Vehicle Status Code");
+                                        Vehicle.Modify
+                                    end;
 
                                 if UpholsteryAssmbl <> '' then
                                     InteriorCode := UpholsteryAssmbl
@@ -525,5 +527,9 @@ Codeunit 25006293 "Purchase Post Event Management"
             until ProcessChecklistHdr.Next = 0;
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforePostCommitPurchaseDocOnBeforeUpdateVehicleStatus(var PurchLine: Record "Purchase Line"; var Vehicle: Record Vehicle; var IsHandled: Boolean)
+    begin
+    end;
 }
 

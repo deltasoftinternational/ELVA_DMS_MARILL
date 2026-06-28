@@ -239,9 +239,9 @@ Table 25006145 "Service Header EDMS"
                 "Gen. Bus. Posting Group" := Cust."Gen. Bus. Posting Group";
                 "VAT Bus. Posting Group" := Cust."VAT Bus. Posting Group";
                 "VAT Registration No." := Cust."VAT Registration No.";
-                //"Responsibility Center" := UserMgt.GetRespCenter(3, Cust."Responsibility Center");
+                "Responsibility Center" := UserMgt.GetRespCenter(3, Cust."Responsibility Center");
                 "Responsibility Center" := UserMgtELVA.GetRespCenterEDMS(Cust."Responsibility Center");
-                //VALIDATE("Location Code",UserMgt.GetLocation(3,Cust."Location Code","Responsibility Center"));
+                VALIDATE("Location Code", UserMgt.GetLocation(3, Cust."Location Code", "Responsibility Center"));
 
 
                 Validate("Vehicle Item Charge No.", Cust."Default Service Item Charge");
@@ -5408,6 +5408,7 @@ Table 25006145 "Service Header EDMS"
                     "Rent Order No." := RentLine."Document No.";
                     if RentHeader.Get(RentHeader."Document Type"::Order, RentLine."Document No.") then
                         "Rent Customer" := RentHeader."Sell-to Customer Name";
+                    OnAfterRentOrderInfoUpdate(Rec, RentAsset, RentLine, RentHeader);
                     Modify();
                 end;
             until (RentAsset.Next() = 0) or ("Rent Order No." <> '');
@@ -5451,5 +5452,10 @@ Table 25006145 "Service Header EDMS"
     Begin
 
     End;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterRentOrderInfoUpdate(Var Rec: Record "Service Header EDMS"; RentAsset: Record "Rent Asset"; RentLine: Record "Rent Line"; RentHeader: Record "Rent Header")
+    begin
+    end;
 }
 
